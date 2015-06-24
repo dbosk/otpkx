@@ -1,0 +1,581 @@
+\title{%
+Towards Perfectly Secure Communication Using an NFC-Based Key-Exchange Scheme  
+}
+\author{%
+  Daniel Bosk\inst{1}
+  \and
+  Martin Kjellqvist\inst{2}
+  \and
+  Sonja Buchegger\inst{1}
+}
+\institute{%
+  School of Computer Science and Communication,\\
+  KTH Royal Institute of Technology, SE-100\,44 Stockholm\\
+  Email: \email{\{dbosk,buc\}@kth.se}
+  \and
+  Department of Information and Communication Systems,\\
+  Mid Sweden University, SE-851\,70 Sundsvall\\
+  Email: \email{martin.kjellqvist@miun.se}
+}
+
+\maketitle
+\begin{abstract}
+  The increased electronic communication of today has many advantages for the 
+  users.
+  But it also comes with a cost: reduction in privacy.
+  There are many tools in use to increase privacy in the electronic setting.
+  While providing some desirable privacy properties, they come up short for 
+  some properties in the modern surveillance state.
+  When one actor can can collect, store and search Internet-wide transcripts of 
+  communication, some of the usually desirable properties force us to commit to 
+  our communication.
+  We lose the possibility of deniability.
+  In this paper we first analyse the possibility for deniability under a strong 
+  adversary, who has an Internet-wide transcript of the communication.
+  Secondly, we present a scheme which provides deniability under this stronger 
+  adversary model.
+  This scheme use physical meetings for exchanges of large amounts of random 
+  key-data via near-field communication and later uses this random data to key 
+  a one-time pad for text-messaging.
+  Finally we evaluate the practical feasibility of the suggested scheme.
+
+  \keywords{%
+    deniability, perfect secrecy, surveillance, strong adversary model, 
+    key-exchange, near-field communication
+  }
+\end{abstract}
+
+
+\acresetall{}
+\section{Introduction}
+
+We have learned a lot about modern government surveillance from the Snowden 
+revelations starting in 2013.
+For our current treatment, the most interesting ones are the tapping of 
+fibre-optic cables~\cite{fibretap}, the storage of all intercepted encrypted 
+data~\cite{cryptostore}, the search~\cite{xkeyscore} and visualization 
+capabilities~\cite{boundlessinformant} for all intercepted data.
+It is not the details that are interesting, it is the fact that one actor can 
+collect, store and search Internet-wide transcripts of communication.
+This paper focuses on the possibility of deniability in this setting.
+
+Today, \ac{GPG}~\cite{gpg}, \ac{OTR}~\cite{otr} and TextSecure 
+\cite{textsecure} are among the popular services used for private 
+communication.
+\ac{GPG} provides standard asymmetric and symmetric encryption, intended for 
+use with email.
+In 2004, \citeauthor{otr2004}~\cite{otr2004} first described the \ac{OTR} due 
+to limitations of deniability in \ac{GPG}.
+The design goal of the protocol is to achieve strong privacy properties for 
+users' online communication, the same properties as expected from 
+a face-to-face conversation.
+The main application at the time was \ac{IM} through tools like Pidgin 
+\cite{pidgin} (formerly Gaim).
+In 2010, OpenWhisperSystems adapted and implemented the \ac{OTR} messaging 
+protocol~\cite{frosch2014secure} for use in the smartphone text-messaging app 
+TextSecure.
+
+The construction used for deniability in \ac{OTR}, and the derived protocols, 
+is based on the principle <innocent until proven otherwise>.
+While this holds true for most civil societies, it is not true everywhere.
+There are circumstances in which the principle <guilty until proven otherwise> 
+is applied instead.
+For these circumstances, with an adversary that can record all network traffic, 
+it is not possible to create any false witness (proof-of-innocence) due to the 
+deterministic nature of the protocol.
+In Sect.~\ref{sec:undeniability} we show that this allows an adversary with 
+transcripts of all network traffic to verify any statements about the 
+conversation using the transcripts.
+To thwart this we need truly deniable encryption, as defined by 
+\citet{deniablecrypt}, which means that we need to introduce some randomness.
+
+\subsection{Our Contributions}
+
+In Sect.~\ref{sec:undeniability} we show that an adversary who can record all 
+communication in a network can use the deterministic properties of commonly 
+used mechanisms to reject lies about any communication.
+In Sect.~\ref{sec:deniability} we outline what is needed to achieve 
+deniability.
+
+Our main contribution, however, is presented in Sect.~\ref{sec:otp-kx}.
+We use \ac{NFC} in smartphones to exchange large-enough amounts of random data 
+when two users physically meet.
+Later, when the users are apart, this data is used to key a \ac{OTP} for use 
+when communicating.
+This is a work-around to achieve deniable communication, but due to the use of 
+the \ac{OTP} the communication is even perfectly secure.
+This scheme is described in detail in Sect.~\ref{sec:otp-kx}.
+
+To estimate the feasibility of this scheme we investigate
+\begin{itemize}
+  \item the order of magnitude of random data needed to be able to cover 
+    everyday text-message conversation;
+
+  \item if the \ac{NFC} transmission rates in combination with the number of 
+    physical meetings can provide high enough exchange rates in practice; and
+
+  \item how the continuous key-generation in this scheme affects battery life 
+    in the device.
+\end{itemize}
+
+We answer the first question by estimating the amount of private communication 
+for some users.
+The details can be found in Sect.~\ref{sec:NeededRandomness}.
+
+We answer the second question by estimating the required number of physical 
+meetings for the same users.
+Since we have an estimate of the amount of exchanged randomness needed and the 
+transmission rates for the \ac{NFC} protocol, we can estimate how many physical 
+meetings and how long transfers are needed to cover the needs.
+The details can be found in Sect.~\ref{sec:Meetings}.
+
+For the third question, we estimate the battery usage by performing key 
+generation and exchanges using different Android-based phones while monitoring 
+the battery consumption.
+The details can be found in Sect.~\ref{sec:Battery}.
+
+Finally we present our conclusions and suggest future work in 
+Sect.~\ref{sec:Conclusions}.
+
+
+\section{Why Alice and Bob Currently Must Forget Their Conversation}
+\label{sec:undeniability}
+
+The security of today's popular services---\ac{GPG}, \ac{OTR} and 
+TextSecure---rely on the standard cryptographic mechanisms.
+These mechanisms provide strong security properties.
+In this section we outline why some of these properties are too strong for 
+deniability in the setting where the adversary has a transcript of all 
+communications.
+
+% XXX add more details about the adversary model
+As we suggested above, we assume a stronger adversary Eve.
+Eve records all network traffic---globally, i.e.~the entire Internet.
+This means that Eve has a transcript of all communication that has taken place 
+and any future communication will also be entered into her transcript.
+We further assume that Eve is passive, i.e.~she will not be able to access the 
+devices used in the communication.
+Instead, she will accuse us based on the data and meta-data recorded in her 
+transcript.
+Eve is trusted by the courts, and hence her transcript is also trusted.
+
+\ac{GPG} provides asymmetric and symmetric encryption intended to be used with 
+email.
+\citet{otr2004} already presented arguments against \ac{GPG} (and \acl{PGP}, 
+\acs{PGP}), but we will summarize them here.
+If Alice wants to send a message \(m\) to Bob, then she will encrypt it for 
+Bob's public key \(k_B\).
+She will then create a signature for the resultant ciphertext \(c = \Enc_{k_B}( 
+m )\) with her own private key \(k_A^{-1}\), i.e.~\(s = \Sign_{k_A^{-1}}( H(c) 
+)\).
+Alice will then send the ciphertext block and the signature to Bob, and this 
+transaction will be recorded in Eve's transcript.
+This scheme provides non-repudiation, i.e.~Alice can not deny having sent the 
+message \(m\) at a later time and Bob can also prove to a third party that 
+Alice sent \(m\).
+Further, Eve can also prove that Alice sent \(c\), but she can only verify the 
+plaintext \(m\) if Bob would reveal it to her.
+
+In their paper, \citet{otr2004} suggested a scheme which does not have this 
+problem: the \ac{OTR} messaging protocol.
+This protocol provides authentication for Alice and Bob, so that they can trust 
+they are talking to the right person.
+But they can do no more than that, Bob can no longer prove to a third party 
+what Alice has sent.
+They accomplish this by a continuous use of the \ac{DH} key-exchange and 
+a \ac{crMAC} based on symmetric keys.
+Alice chooses a secret exponent \(a\) and Bob chooses a secret exponent \(b\).
+Alice signs \(g^a\) and sends \[
+  A\to B\colon g^a, \Sign_{k_A^{-1}}( g^a )
+\] to Bob.
+Bob conversely sends \(g^b, \Sign_{k_B^{-1}}( g^b )\) to Alice.
+By this time they can both compute the secret shared-key \(k = g^{ab}\).
+Let \(H_E\) and \(H_M\) be two cryptographically secure hash functions, used 
+for deriving encryption and \ac{crMAC} keys, respectively.
+When Alice wants to send the message \(m\) to Bob, she chooses a random 
+\(a^\prime\) and sends \[
+  A\to B\colon g^{a^\prime}, c = \Enc_{H_E( k )}( k )\oplus m,
+  \MAC_{H_M( k )}( g^{a^\prime}, c )
+\] to Bob.
+Once she knows Bob has received the message she also sends the \ac{crMAC} key 
+\(H_M( k )\) to Bob.
+The next time Alice wants to send a message to Bob, she will use \(k^\prime 
+= g^{a^\prime b}\).
+
+Now, Bob can no longer prove to a third party what Alice has said.
+This is due to the \ac{crMAC} being based on a secret key which Bob has access 
+to.
+% XXX why does Alice need to send the MAC key to Bob as he already has it?
+Also, since the encryption is done in counter mode~\cite{blockmodes}, the 
+ciphertext is malleable.
+This means that flipping a bit in the ciphertext, yields the same flip in the 
+plaintext.
+% answer to above: possibly so that an eavesdropper can do it too.
+Thus, anyone possessing the \ac{crMAC} key can modify the plaintext by flipping 
+the bits in the ciphertext and then generate a new \ac{crMAC}.
+
+\subsection{Verifying Who Sent What}
+
+The arguments for forgeability using malleable encryption and publishing the 
+\ac{crMAC} keys only hold if the adversary cannot trust the source of the 
+transcript.
+The more powerful Eve can ultimately trust the transcript since she collected 
+it herself from the network.
+And since the courts trust Eve, they also trust the transcript.
+%In this setting, Eve knows exactly which ciphertext Alice sent to Bob, and 
+%which ciphertext Bob replied.
+%Thus, no one has the chance of using the malleability property, since Eve will 
+%know they did so.
+
+In this setting the forgeability property vanishes.
+Eve knows that no one has modified the ciphertext, she recorded in her 
+transcript as it left Alice and arrived to Bob.
+She also recorded Alice publishing the \ac{crMAC} key used for the signature.
+This allows Eve to use the \ac{crMAC} for each ciphertext to verify them.
+She knows that Alice is the author of a message because she observes when Alice 
+publishes the \ac{crMAC} key.
+
+\subsection{Verifying Encryption Keys}
+
+Furthermore, Eve also learns some information about the key from the ciphertext 
+and \ac{crMAC}.
+Eve can use the \ac{crMAC} to discard false keys for the ciphertext.
+Since Eve has \(s = \MAC_{H_M( k )}( c )\) for a ciphertext \(c\) recorded in 
+her transcript, she can reject a key \(k^\prime\neq k\) by verifying that
+\(\MAC_{H_M( k^\prime )}( c ) \neq s\).
+Hence, by having the \ac{crMAC} key depend on the encryption key, we 
+automatically decrease the number of spurious keys and thus also reduce our 
+possibility for deniability.
+
+\subsection{How Hard Is Deniability?}
+\label{sec:HardnessOfDeniability}
+
+As suggested above, we have difficulty achieving deniability.
+This is illustrated by the following equations.
+Assume
+\begin{equation*}
+  \Enc_{H_E(k)}( m ) = c = \Enc_{H_E(k^\prime)}( m^\prime )
+\end{equation*}
+and \(k\neq k^\prime\), then
+\begin{equation*}
+  \Pr\left[
+    \MAC_{H_M(k)}( c ) = \MAC_{H_M(k^\prime)}( c )
+  \right]
+  \approx
+  \Pr\left[ H_M(k) = H_M(k^\prime) \right].
+\end{equation*}
+I.e.~our chance of lying about the key \(k\), replacing it with a key 
+\(k^\prime\), is reduced to finding a collision for the hash function \(H_M\).
+(There is also the negligible probability of \(\MAC_x(c) = \MAC_{x^\prime}(c)\) 
+for \(x\neq x^\prime\) to consider.)
+
+Furthermore, we find the key \(k^\prime\) by finding the preimage of \(H_E( 
+k^\prime )\).
+And if the encryption system \(\Enc\) is known-plaintext resistant, then we 
+will have to break that first, just to find \(H_E( k^\prime )\) before we can 
+attempt finding its preimage.
+
+
+\section{Requirements for Deniability}
+\label{sec:deniability}
+
+% XXX add more details about deniable encryption
+(Add more details about deniable encryption.)
+The definition of deniable encryption~\cite{deniablecrypt} states that given 
+a ciphertext \(c = \Enc_k( m )\) and a false plaintext \(m^\prime\), there 
+exists a polynomial-time algorithm \(\phi\) such that \(\phi( c, m^\prime 
+) = k^\prime\) yields a key \(k^\prime\) and \(m^\prime = \Dec_{k^\prime}( 
+c )\).
+With the reasoning in Sect.~\ref{sec:HardnessOfDeniability}, there exists no 
+such polynomial-time algorithm \(\phi\) for \ac{OTR} or \ac{GPG}.
+This is due to the property of known-plaintext security.
+
+To be able to get deniability in the given scenario, Alice and Bob need to be 
+able to modify the plaintext without modifying the ciphertext.
+They also need a \ac{crMAC} key independent from the encryption key.
+Then they can change the encryption key and the plaintext, but the ciphertext 
+and \ac{crMAC} remains the same.
+
+One encryption system for which known-plaintext attacks are easy is the 
+\ac{OTP}~\cite[cf.][Chap.~2]{Stinson2006cta}.
+% XXX add OTP analysis, description, references
+(Describe OTP, its interesting properties.)
+If \(\Enc\) used in \ac{OTR} would be replaced with \ac{OTP}, then we can 
+easily compute the false key \(k^\prime\) from a given plaintext-ciphertext 
+pair.
+
+We also want to resolve the problem of the \ac{crMAC} being a witness for the 
+correct key.
+Instead of deriving the encryption key and the \ac{crMAC} key by using two 
+different key-derivation functions on the same master key, we can simply 
+increase the size and split the master key.
+If we use a key size of 2048 bits, then we can use 256 bits for the \ac{crMAC} 
+key and the other 1792 bits for encryption with \ac{OTP}.
+%That is 224 bytes, which is larger than what Twitter allows for a tweet (140 
+%characters) or an SMS (text message).
+This way, when using the \ac{OTP} we can keep the \ac{crMAC} key fixed while 
+adapting the encryption key to our new plaintext, then hand the complete key 
+(both \ac{crMAC} and encryption) to the adversary as a (false) witness.
+
+
+\section{Achieving Deniability}
+\label{sec:otp-kx}
+
+A work-around is to replace the \ac{DH} key exchange with pre-shared 
+randomness.
+Due to the deniability requirements outlined above, the randomness cannot be 
+extended by a \ac{PRNG}: if we do, then we are in the same situation as when 
+using a known-plaintext resistant cipher---we cannot find a seed to the 
+\ac{PRNG} which yields a stream that decrypts the ciphertext to the desired 
+plaintext.
+Instead we generate randomness and then exchange it using the \ac{NFC} 
+functionality of smartphones.
+This way we can use the everyday chance-encounters for exchanging the generated 
+randomness when we meet, and then use it to key the \ac{OTP} scheme when 
+physically apart.
+
+\subsection{The Protocol}
+
+% XXX describe in more detail, still rely on OTR?
+% XXX we can still publish the MAC key, so that NSA cannot prove to third party
+(Describe the details of the protocol: who sends what (illustrate with 
+a protocol diagram), what properties we get, include a security proof.)
+
+\subsection{Implementation and Evaluation}
+
+We have developed an app\footnote{%
+  % XXX fix github URL
+  The source code is available at URL \url{https://github.com/XXX/}.
+} for Android devices which implements the following ideas.
+It generates (cryptographically secure) randomness continuously in the 
+background to build up a pool of randomness.
+On occasion we put two smartphones together, then it uses the \ac{NFC} 
+functionality to transfer randomness to the other phone.
+This is done in both directions to increase the rate transferred and to 
+decrease the load on a single device.
+This randomness is then removed from the pool and associated with a known user.
+The received randomness is also associated with the same user.
+
+From a user perspective, putting two phones together <charges the encryption 
+tool>.
+This is probably a good metaphor to build on, since it builds on the mental 
+model of a battery.
+Users are already familiar with this model, and thus, when running low on 
+randomness, fewer messages should be exchanged until another physical meeting 
+can be arranged to <charge> the tool again.
+
+We should have more details about the protocol \dots
+
+A detailed security proof should go somewhere here, or at least a sketch and 
+details in appendices \dots
+
+To estimate the feasibility of this scheme, we investigate the amount of 
+randomness needed (Sect.~\ref{sec:NeededRandomness}), the average number of 
+meetings for a user (Sect.~\ref{sec:Meetings}), and the battery consumption of 
+the smartphone (Sect.~\ref{sec:Battery}).
+The suitability of the battery metaphor is left for future work.
+The methodology and results are given in each respective section below.
+
+\subsection{The Amount of Randomness Needed}
+\label{sec:NeededRandomness}
+Since we use the \ac{OTP}, we need as much key material as we have plaintext.
+Thus we can estimate the amount of randomness needed by estimating the exchange 
+rate of plaintext.
+To do this we analyse the Enron email dataset\footnote{%
+  % XXX fix github URL
+  The source code for the implementation described below is available at URL 
+  \url{https://github.com/XXX/}.
+}.
+
+We are interested in personal communication, i.e.~we are not interested in 
+newsletters and the like.
+We are not interested in attachments either, so we discard those.
+To filter out the newsletter category of messages, we rely on emails found in 
+the users <sent> directory, since these are emails sent by real users.
+This includes forwarded newsletters, but we argue that these should be included 
+since the user actively wanted to tell someone else about the content.
+Since we are using the \ac{OTP}, we also use key material for the replies.
+We thus also include the received replies to the sent emails.
+The rationale for this is that received replies are not necessarily from people 
+within the Enron company, but the emails are written by real users and should 
+thus be included to give us more accurate data.
+
+% XXX implement mailstat and use that code to get the numbers
+\begin{pycode}[random]
+#import libsci
+#import mailstat
+
+import math
+import decimal
+
+def sciround( x, n ):
+  if x == 0:
+    return "0"
+  exponent = math.floor( math.log10( x ) )
+  ret = ( "{:." + str(n-1) + "f}" ).format( \
+    round( x / math.pow( 10, exponent ), n-1 ) )
+  ret += r"\times 10^{" + str( int( exponent ) )
+  ret += r"}"
+  return ret
+
+message_size = 100.0
+err_size = 3
+
+message_freq = 10.0
+err_freq = 3
+
+data_per_day = message_size * message_freq
+
+contacts = 10.0
+err_cont = 3
+\end{pycode}
+
+In the Enron dataset, we found that the average message was
+\(\unit{\py[random]{sciround( message_size, err_size )}}{\kibi\byte}\),
+excluding any headers and attachments.
+The average user sent
+\(\unit{\py[random]{sciround( message_freq, err_freq )}}{\kibi\byte}\)
+messages per day, i.e.~we need on average
+\(\unit{\py[random]{sciround( data_per_day, min( err_size, err_freq 
+))}}{\kibi\byte}\)
+per day.
+The average user communicates with
+\(\py[random]{sciround( contacts, err_cont )}\)
+other users.
+
+\subsection{The Number of Meetings and Transfer Time}
+\label{sec:Meetings}
+We know from above the average amount of data communicated between users per 
+day.
+We also know that the \ac{NFC} protocol can achieve a transmission rate of up 
+to \unit{424}{\kilo\bit\per\second}.
+In Tab.~\ref{tbl:MeetingsTradeoff} we tabulate how often two users meet 
+compared to how much key material they would need on average until the next 
+meeting and how long time this data would take to transfer.
+We also tabulate the total amount of data needed and the total time needed for 
+exchange of that amount of key material.
+
+\begin{table}
+  \centering
+  \caption{%
+    Meeting frequency compared to the time needed to transfer the required 
+    amount of data.
+    (All numbers have the derived number of significant figures.)
+  }
+  \label{tbl:MeetingsTradeoff}
+  \begin{pycode}[random]
+print( r"""
+\begin{tabular}{lrrrr}
+  Meetings &
+  Time\per contact (\second) &
+  Data\per contact (\kibi\byte) &
+  Total time (\second) &
+  Total data (\kibi\byte) \\
+  \toprule
+""" )
+
+timespans = {
+  1 : "Daily",
+  7 : "Weekly",
+  30 : "Monthly",
+  60 : "Bimonthly",
+  365 : "Annually"
+}
+
+for i in sorted( timespans.keys() ):
+  needed_data = data_per_day * i
+  needed_time = needed_data / ( 424.0 * 1000 / 1024 / 8 )
+  print( r"%s & \(%s\) & \(%s\) & \(%s\) & \(%s\) \\" % \
+  ( timespans[i],
+    sciround( needed_time / contacts, min( err_size, err_freq, 3, err_cont ) ),
+    sciround( needed_data / contacts, min( err_size, err_freq, err_cont ) ),
+    sciround( needed_time, min( err_size, err_freq, 3 ) ),
+    sciround( needed_data, min( err_size, err_freq ) )
+    ) )
+
+print( r"""
+  \bottomrule
+\end{tabular}
+""" )
+  \end{pycode}
+\end{table}
+
+Considering this, we can see that \dots
+
+\subsection{The Battery Consumption}
+\label{sec:Battery}
+% XXX fix the battery consumption section
+To estimate the effects on battery consumption we first build a baseline.
+For this we used the Android systems build-in power-consumption estimates.
+We used one phone as a reference and two others running the app implementing 
+our scheme.
+We performed one key-exchange daily in which we exchanged 
+\(\unit{\py[random]{data_per_day}}{\kibi\byte}\) of key material, i.e.~the 
+amount of key material needed in total per day.
+
+We repeated this for X days and found that \dots
+
+
+\section{Conclusions}
+\label{sec:Conclusions}
+
+\dots
+
+The effect on battery life might not be that important: we might be able to 
+connect the phones to a power source while doing exchange, we can use 
+a dedicated phone for this particular application (hence not be using as much 
+battery as for ordinary use).
+Considering the location-based privacy, we would probably like to keep it in 
+flight-mode.
+Then we would save power which can later be used for the exchange.
+
+Of more concern is whether the randomness pool for the operating systems is 
+drained.
+Then the app's generation of randomness can affect other apps negatively, 
+e.g.~decreasing the available randomness needed for TLS\@.
+
+The method for estimating the amount of communication can be better.
+It depends on the type of communication, e.g.~corporate emails differs from 
+personal text-messaging.
+Due to this it might better to evaluate this from the usage point.
+To better estimate communication needs for private individuals, it might be 
+better to use text-messages (SMSs).
+
+\subsection{Future Work}
+
+There are several interesting directions to follow from this work.
+First, we can argue the need for deniability as compared to not being able to 
+reveal any keys.
+An interesting first step in this direction would be to conduct a study with 
+users: what is the users' perception of deniability, what is more convincing?
+It would also be interesting to contrast this by looking into game theory to 
+see what can be said about the behaviour of a probable liar: do we gain any 
+credibility using this deniable scheme over simply refusing to disclose the 
+key?
+What are the differences if we have a rational adversary compared to an 
+irrational one?
+
+Another direction, into usable security and privacy, would be to study suitable 
+metaphors and mental models for this kind of system.
+We suspect that the mental model of <charging deniability> when we exchange 
+randomness is good, i.e.~that it does not lead to any contradictory behaviours 
+which might put the user's security and privacy at risk.
+Our guess is that this is more intuitive than e.g.~asymmetric encryption.
+
+Finally, to support the user, it would be interesting to have a <budget> 
+algorithm for the exchanges.
+This algorithms would take into account the users' average communication rate 
+and the users' average exchange frequencies, use these data to support the user 
+in planning for future key-exchanges if the communication pattern changes or 
+deviates from normal.
+
+
+\subsubsection*{\ackname}
+
+This work was funded by the Swedish Foundation for Strategic Research grant SSF 
+FFL09-0086 and the Swedish Research Council grant VR 2009-3793.
+We would like to thank the anonymous reviewers for valuable feedback.
+
+
+\printbibliography{}
+
