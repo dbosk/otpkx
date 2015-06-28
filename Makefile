@@ -17,17 +17,11 @@ USE_BIBLATEX= 		yes
 .PHONY: all
 all: otpkx.pdf
 
-deniability.pdf: deniability.tex
-deniability.pdf: llncs biblatex-lncs latexmkrc
-deniability.pdf: otpkx-content.tex
-deniability.pdf: otrmsg-content.tex
-deniability.pdf: otrmsg.bib surveillance.bib crypto.bib
-deniability.pdf: crypto.acr surveillance.acr stdterm.acr
-
 otpkx.pdf: otpkx.tex otpkx-content.tex
 otpkx.pdf: llncs biblatex-lncs latexmkrc
 otpkx.pdf: otrmsg.bib surveillance.bib crypto.bib
 otpkx.pdf: crypto.acr surveillance.acr stdterm.acr
+otpkx.pdf: enron-sent.sqlite3
 
 enron-dataset: enron-dataset.tar.gz
 	pax -rz -f $^ -s "|^maildir/|$@/|"
@@ -35,8 +29,27 @@ enron-dataset: enron-dataset.tar.gz
 enron-dataset.tar.gz:
 	wget -O $@ https://www.cs.cmu.edu/~./enron/enron_mail_20150507.tgz
 
-makefiles libbib:
-	git submodule update --init $@
+enron.sqlite3: mailstat.py enron-dataset
+	./mailstat.py -f $@ -d enron-dataset
+
+enron-sent.sqlite3: mailstat.py enron-dataset
+	find enron-dataset -type d | grep "[Ss]ent" | \
+		xargs ./mailstat.py -f $@ -d
+
+mailstat/mailstat.py: mailstat
+	${MAKE} -C mailstat mailstat.py
+
+mailstat.py: mailstat/mailstat.py
+	[ -e $@ ] || ln -s $^ $@
+	chmod +x $@
+
+makefiles libbib mailstat:
+	git submodule update --init --recursive $@
+
+.PHONY: clean
+clean:
+	${RM} mailstat.py
+	${MAKE} -C mailstat clean
 
 .PHONY: clean-depends
 clean-depends:
