@@ -585,7 +585,7 @@ mean_contacts, stddev_contacts = \
 mean_contacts = mean_contacts.quantize( precdata )
 stddev_contacts = stddev_contacts.quantize( precdata )
 
-data_per_day = mean_msg_size * mean_msg_freq
+data_per_day = ( mean_msg_size + stddev_msg_size ) * mean_msg_freq
 \end{pycode}
 
 \marginnote{\raggedright
@@ -629,11 +629,10 @@ users to exchange keys with.
 \reversemarginpar
 If a user sends
 \(\py[random]{mean_msg_freq}\)
-messages per day, then we need on average
+messages per day, then we need on average less than
 \(\unit{\py[random]{(data_per_day/1024).quantize( 10 )}}{\kibi\byte}\)
 per day.
 
-% XXX how secure is Android's SecureRandom?  enough entropy?
 When we use Android's <SecureRandom> to generate our randomness, we can 
 generate enough amounts of random data.
 Some research \cite{AndroidLowEntropyMyth,JavaRandomness} suggest that 
@@ -648,7 +647,7 @@ further.
 From the above analysis, we know the average amount of data communicated 
 between users per day.
 We also know that the \ac{NFC} protocol can achieve a transmission rate of up 
-to \unit{424}{\kilo\bit\per\second}.
+to \unit{424}{\kilo\bit\per\second}~\cite{NFCController}.
 In Tab.~\ref{tbl:MeetingsTradeoff} we tabulate how often two users meet 
 compared to how much key-material they would need on average until the next 
 meeting and how long time this data would take to transfer using \ac{NFC}.
@@ -711,8 +710,8 @@ For this we used the Android systems build-in power-consumption estimates.
 We used one phone as a reference and two others running the app implementing 
 our scheme.
 We performed one key-exchange daily in which we exchanged 
-\(\unit{\py[random]{data_per_day}}{\kibi\byte}\) of key material, i.e.~the 
-amount of key material needed in total per day.
+\(\unit{\py[random]{(data_per_day/1024).quantize( precdata )}}{\kibi\byte}\) of 
+key material, i.e.~the amount of key material needed in total per day.
 
 We repeated this for X days and found that \dots
 
