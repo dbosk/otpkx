@@ -664,7 +664,7 @@ print( r"""
 \begin{tabular}{lrr}
   Exchange &
   Time (\second) &
-  Key-material (\byte) \\
+  Key-material (\kibi\byte) \\
   \toprule
 """ )
 
@@ -683,7 +683,7 @@ for i in sorted( timespans.keys() ):
   print( r"%s & \(%s\) & \(%s\) \\" % \
   ( timespans[i],
     ( needed_time ).quantize( prectime ),
-    ( needed_data ).quantize( precdata )
+    ( needed_data/1024 ).quantize( precdata )
     ) )
 
 print( r"""
