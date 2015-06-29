@@ -612,11 +612,11 @@ per day.
 When we use Android's <SecureRandom> to generate our randomness, we can 
 generate enough amounts of random data.
 Some research \cite{AndroidLowEntropyMyth,JavaRandomness} suggest that 
-<SecureRandom> does not generate high entropy.
+<SecureRandom> under certain circumstances uses a low entropy seed.
 However, the documentation states that SecureRandom can be relied upon for 
 cryptographic purposes.
-This makes us uncertain about the entropy of the generated data, and whether 
-this is suitable for use with the \ac{OTP}.
+Thus the security in using SecureRandom for the \ac{OTP} must be investigated 
+further.
 
 \subsection{The Number of Meetings and Transfer Time}
 \label{sec:Meetings}
