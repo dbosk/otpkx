@@ -415,14 +415,6 @@ adapting the encryption key to our new plaintext, then hand the keys for both
 \section{Achieving Deniability}
 \label{sec:otp-kx}
 
-% XXX what happens if we run out of randomness?
-% - talk about what happens if you can't meet or run out of randomness. You 
-% should be able to fall back on the original otr and never be worse off than 
-% that
-% XXX emphasize that the Enron set is just one example
-% - emphasize that the Enron set is just one example, only used to get a very 
-% rough estimate
-% - perhaps you can show that in the protocol diagram or in pseudocode
 % XXX move emphasis from quantification to security proofs
 % - now there's a lot of emphasis on the quantification.  Once you have more of 
 % a protocol description and proof (sketch), this should balance out. Point out 
@@ -435,22 +427,42 @@ encryption cannot be extended by a \ac{PRNG}: if we do, then we are in the same
 situation as when we were using a trap-door permutation---we cannot efficiently 
 find a seed to the \ac{PRNG} which yields a stream that decrypts the ciphertext 
 to the desired plaintext.
-Instead we generate randomness and then exchange it using the \ac{NFC} 
-functionality of smartphones.
+Instead we generate randomness continuously and then exchange it using the 
+\ac{NFC} functionality of smartphones.
 This way we can use the everyday chance-encounters for exchanging the generated 
 randomness when we meet, and then use it to key the \ac{OTP} scheme when 
 physically apart.
 
 \subsection{The Protocol}
 
-% XXX describe protocol in more detail, still rely on OTR?
+% XXX describe protocol in more detail
+% - still rely on OTR?
 % - who sends what (illustrate with a protocol diagram)
 % - we can still publish the MAC key, so that NSA cannot prove to third party
 % - what properties do we get, include a security proof
+% - talk about what happens if you can't meet or run out of randomness. You 
+% should be able to fall back on the original otr and never be worse off than 
+% that
+% - perhaps you can show that in the protocol diagram or in pseudocode
+
 Alice and Bob want to communicate using this protocol.
 This randomness is then removed from the pool and associated with a known user.
 The received randomness is also associated with the same user.
 The protocol is illustrated in Fig.~\ref{fig:Protocol}.
+
+From a user perspective, putting two phones together <charges the encryption 
+tool>.
+This is probably a good metaphor to build on, since it builds on the mental 
+model of a battery.
+Users are already familiar with this model, and thus, when running low on 
+randomness, fewer messages should be exchanged until another physical meeting 
+can be arranged to <charge> the tool again.
+
+We should have more details about the protocol \dots
+
+A detailed security proof should go somewhere here, or at least a sketch and 
+details in appendices \dots
+
 \marginpar{\raggedright
   Both this section and this figure are far from done \dots
 }
@@ -459,17 +471,26 @@ The protocol is illustrated in Fig.~\ref{fig:Protocol}.
   \centering
   \begin{sequencediagram}
     \newinst{A}{Alice}
-    \newinst[3]{E}{Eve}
-    \newinst[3]{B}{Bob}
+    \newinst[1]{E}{Eve}
+    \newinst[1]{B}{Bob}
 
-    \begin{sdblock}{Private channel}{}
-      \mess{A}{Random data}{B}
-    \end{sdblock}
-    \begin{sdblock}{Public channel}{}
-      \mess{A}{Ciphertext and MAC}{E}
-      \mess{E}{Ciphertext and MAC}{B}
-      \mess{B}{Ciphertext and MAC}{E}
-      \mess{E}{Ciphertext and MAC}{A}
+    \mess{A}{Private channel}{B}
+    \node[anchor=east] at (mess from) {$k_i, k_{i+1}, \ldots, k_j$};
+
+    \begin{sdblock}{Public channel}{Eve records this traffic}
+      \mess{A}{}{E}
+      \node[anchor=east] at (mess from)
+      {\shortstack{$\Enc_{k_i}( m_{i^\prime} ) = c_{i^\prime}$, \\ 
+      $\MAC_{k_{i+1}}( c_{i^\prime} )$}};
+      \prelevel
+      \mess{E}{}{B}
+
+      \mess{B}{}{E}
+      \node[anchor=west] at (mess from)
+      {\shortstack{$\Enc_{k_{i+2}}( m_{i^\prime+1} ) = c_{i^\prime+1}$, \\
+      $\MAC_{k_{i+3}}( c_{i^\prime+1} )$}};
+      \prelevel
+      \mess{E}{}{A}
     \end{sdblock}
 
   \end{sequencediagram}
