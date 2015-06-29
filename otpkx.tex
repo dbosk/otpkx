@@ -8,6 +8,9 @@
 \usepackage{xparse}
 \usepackage{booktabs}
 \usepackage{pythontex}
+
+\usepackage[fulladjust]{marginnote}
+
 \usepackage[natbib,style=lncs,maxbibnames=99,backend=biber]{biblatex}
 \addbibresource{otrmsg.bib}
 \addbibresource{surveillance.bib}
@@ -38,6 +41,7 @@
 \NewDocumentCommand{\Z}{}{\ensuremath \mathbb Z}
 \NewDocumentCommand{\K}{}{\ensuremath \mathcal K}
 \DeclareMathOperator{\textand}{\qquad and\qquad}
+\DeclareMathOperator{\com}{\textsc com}
 
 \usepackage[binary,amssymb]{SIunits}
 
@@ -46,6 +50,9 @@
 \NewDocumentCommand{\alg}{m}{%
   \textsc{#1}%
 }
+
+\usepackage{tikz}
+\usepackage[underline=false]{pgf-umlsd}
 
 \pagestyle{plain}
 
