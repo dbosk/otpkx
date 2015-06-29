@@ -123,8 +123,9 @@ To estimate the feasibility of this scheme we investigate
   \item the order of magnitude of random data needed to be able to cover 
     everyday text-message conversation;
 
-  \item if the \ac{NFC} transmission rates in combination with the number of 
-    physical meetings can provide high enough exchange rates in practice; and
+  \item if the \ac{NFC} transmission rates and the random number generation in 
+    combination with the number of physical meetings can provide high enough 
+    exchange rates in practice; and
 
   \item how the continuous key-generation in this scheme affects battery life 
     in the device.
@@ -328,8 +329,6 @@ They also need a \ac{crMAC} key independent from the encryption key.
 Then they can change the encryption key and the plaintext, but the ciphertext 
 and \ac{crMAC} remains the same.
 
-% - quote Canetti's definition
-% - later \ref to that definition
 \citeauthor{deniablecrypt} gave the original formal definition of deniable 
 encryption in their seminal paper \cite{deniablecrypt}.
 We will give their definition of sender-deniable encryption for shared-key 
@@ -486,29 +485,15 @@ We have developed an app\footnote{%
   % XXX fix github URL
   The source code is available at URL \url{https://github.com/X/}.
 } for Android devices which implements the above ideas.
-It generates (cryptographically secure) randomness continuously in the 
-background to build up a pool of randomness.
-On occasion we put two smartphones together, then it uses the \ac{NFC} 
-functionality to transfer randomness to the other phone.
-
-From a user perspective, putting two phones together <charges the encryption 
-tool>.
-This is probably a good metaphor to build on, since it builds on the mental 
-model of a battery.
-Users are already familiar with this model, and thus, when running low on 
-randomness, fewer messages should be exchanged until another physical meeting 
-can be arranged to <charge> the tool again.
-
-We should have more details about the protocol \dots
-
-A detailed security proof should go somewhere here, or at least a sketch and 
-details in appendices \dots
+It generates randomness continuously in the background to build up a pool of 
+randomness.
+It can also exchange this randomness with another phone over \ac{NFC}.
 
 To estimate the feasibility of this scheme, we investigate the amount of 
-randomness needed (Sect.~\ref{sec:NeededRandomness}), the average number of 
-meetings for a user (Sect.~\ref{sec:Meetings}), and the battery consumption of 
-the smartphone (Sect.~\ref{sec:Battery}).
-The suitability of the battery metaphor is left for future work.
+randomness needed and how much randomness we can generate 
+(Sect.~\ref{sec:NeededRandomness}), the required and possible transfer times 
+over \ac{NFC} (Sect.~\ref{sec:Meetings}), and finally how this scheme affects 
+the battery consumption of the smartphone (Sect.~\ref{sec:Battery}).
 The methodology and results are given in each respective section below.
 
 \subsection{The Amount of Randomness Needed}
@@ -617,6 +602,16 @@ If a user sends
 messages per day, then we need on average
 \(\unit{\py[random]{(data_per_day/1024).quantize( prec )}}{\kibi\byte}\)
 per day.
+
+% XXX how secure is Android's SecureRandom?  enough entropy?
+When we use Android's <SecureRandom> to generate our randomness, we can 
+generate enough amounts of random data.
+Some research \cite{AndroidLowEntropyMyth,JavaRandomness} suggest that 
+<SecureRandom> does not generate high entropy.
+However, the documentation states that SecureRandom can be relied upon for 
+cryptographic purposes.
+This makes us uncertain about the entropy of the generated data, and whether 
+this is suitable for use with the \ac{OTP}.
 
 \subsection{The Number of Meetings and Transfer Time}
 \label{sec:Meetings}

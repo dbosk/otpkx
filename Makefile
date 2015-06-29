@@ -21,6 +21,7 @@ otpkx.pdf: otpkx.tex otpkx-content.tex
 otpkx.pdf: llncs biblatex-lncs latexmkrc
 otpkx.pdf: otrmsg.bib surveillance.bib crypto.bib
 otpkx.pdf: crypto.acr surveillance.acr stdterm.acr
+otpkx.pdf: otpkx.bib
 otpkx.pdf: enron-sent.sqlite3
 
 enron-dataset: enron-dataset.tar.gz
