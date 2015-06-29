@@ -463,8 +463,8 @@ We should have more details about the protocol \dots
 A detailed security proof should go somewhere here, or at least a sketch and 
 details in appendices \dots
 
-\marginpar{\raggedright
-  Both this section and this figure are far from done \dots
+\marginnote{\raggedright
+  This section is far from done \dots
 }
 
 \begin{figure}
@@ -587,14 +587,15 @@ stddev_contacts = stddev_contacts.quantize( precdata )
 data_per_day = mean_msg_size * mean_msg_freq
 \end{pycode}
 
-\marginpar{\raggedright
+\marginnote{\raggedright
   \textbf{Note:}
   The numbers in this and the following sections are preliminary.
   We have not yet analysed the dataset in detail to discover any possible 
   problems, e.g.~that replies usually include the history of the conversation.
-
-  This is also the reason why they are rounded to have no decimals, rather than 
-  rounded according to their number of significant digits.
+  This is also the reason why they are rounded to have one or no decimals, 
+  rather than rounded according to their number of significant digits.
+  All numbers will be rounded to the number of significant digits in the final 
+  version of the paper.
 }
 In the Enron dataset, we found that the average message was
 \(\unit{\py[random]{mean_msg_size}}{\byte}\)
@@ -616,13 +617,15 @@ This means that an <extreme> user has approximately
 + 3*stddev_contacts).quantize(decimal.Decimal(10))}\)
 users to exchange keys with.
 
-\marginpar{\raggedright
+\reversemarginpar
+\marginnote{\raggedright
   \textbf{Note:}
   We have not yet estimated this number from the dataset.
   We chose the number \py[random]{mean_msg_freq} as a reasonably high guess.
   The estimated value from the dataset will be available in the final version 
   of the paper.
 }
+\reversemarginpar
 If a user sends
 \(\py[random]{mean_msg_freq}\)
 messages per day, then we need on average
