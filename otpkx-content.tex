@@ -509,10 +509,6 @@ To do this we analyse the Enron email dataset\footnote{%
   The source code for the data analysis described below is available at URL 
   \url{https://github.com/X/}.
 }.
-Since this dataset contains a mix of corporate and private emails, and is 
-fairly small, it is hard to draw any general conclusions from it.
-But our main goal is to get an estimate of user communication to see whether 
-our scheme is feasible or not.
 
 We are interested in personal communication, i.e.~we are not interested in 
 newsletters and the like.
@@ -529,6 +525,13 @@ to tell someone else about the content.
 %The rationale for this is that received replies are not necessarily from people 
 %within the Enron company, but the emails are written by real users and should 
 %thus be included to give us more accurate data.
+
+Since this dataset contains a mix of corporate and private emails, and is 
+fairly small, it is hard to draw any general conclusions from it.
+But our main goal is to get an estimate of user communication to see whether 
+our scheme is completely infeasible or not.
+So the Enron dataset is just one example, communication using other media, 
+e.g.~text messages rather than email, would probably differ.
 
 \begin{pycode}[random]
 import math
@@ -592,6 +595,7 @@ This means that an <extreme> user has approximately
 users to exchange keys with.
 
 \marginpar{\raggedright
+  \textbf{Note:}
   We have not yet estimated this number from the dataset.
   We chose the number \py[random]{mean_msg_freq} as a reasonably high guess.
   The estimated value from the dataset will be available in the final version 
