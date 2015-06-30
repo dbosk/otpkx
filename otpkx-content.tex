@@ -345,13 +345,13 @@ schemes here.
     \item[Security] For any \(m_1, m_2\in M\) in the message-space \(M\) and 
       a shared-key \(k\in K\) chosen at random from the key-space \(K\), then 
       we have \(\Pr[ \Enc_k( m_1 ) = c ] \approx \Pr[ \Enc_{k^\prime}( m_2 
-      ) = c ].\)
+      ) = c ]\).
 
     \item[Deniability] There exists an efficient <faking> algorithm \(\phi\) 
-      having the following property with respect to any \(m_1, m_2\in M.\)
+      having the following property with respect to any \(m_1, m_2\in M\).
       Let \(k, r_S, r_R\) be uniformly chosen shared-key and random inputs of 
       \(S\) and \(R\), respectively, let \(c = \Enc_{k, r_S, r_R}( m_1 )\) and 
-      let \((k^\prime, r_S^\prime) = \phi( m_1, k, r_S, c, m_2 ).\)
+      let \((k^\prime, r_S^\prime) = \phi( m_1, k, r_S, c, m_2 )\).
       Then the random variables \[
         ( m_2, k^\prime, r_S^\prime, c ) \text{ and }
         ( m_2, k, r_S, \Enc_{k, r_S, r_R}( m_2 ) )
@@ -603,7 +603,7 @@ In the Enron dataset, we found that the average message was
 \(\unit{\py[random]{mean_msg_size}}{\byte}\)
 excluding any headers and attachments.
 The standard deviation was
-\(\unit{\py[random]{stddev_msg_size}}{\byte}.\)
+\(\unit{\py[random]{stddev_msg_size}}{\byte}\).
 The large standard deviation can probably be explained by the data being 
 emailed:
 If a conversation requires a few rounds, then the previous messages accumulate 
@@ -613,7 +613,7 @@ We also found that the average user communicates with
 \(\py[random]{mean_contacts}\)
 other users.
 The standard deviation was
-\(\py[random]{stddev_contacts}.\)
+\(\py[random]{stddev_contacts}\).
 This means that an <extreme> user has approximately
 \(\py[random]{(mean_contacts 
 + 3*stddev_contacts).quantize(decimal.Decimal(10))}\)
