@@ -49,10 +49,6 @@
   }
 \end{abstract}
 
-% XXX Weaken some statements
-% - E.g. since the court trusts Eve -> if the court trusts Eve.
-%   Otherwise you give reviewers cause for saying but that's not always true
-
 \acresetall{}
 \section{Introduction}
 
@@ -97,7 +93,7 @@ To thwart this we need truly deniable encryption, as defined by
 
 \subsection{Our Contributions}
 
-We start from systems like \ac{OTR}, but we assume a stronger adversary.
+We start from protocols like \ac{OTR}, but we assume a stronger adversary.
 This stronger adversary model breaks some assumptions in \ac{OTR}-like 
 protocols and removes the possibility for deniability.
 We still want to achieve the same basic properties, e.g.~mutual authentication, 
@@ -159,8 +155,6 @@ We start by presenting the system model.
 Then we continue by presenting the adversary model and highlighting the 
 differences compared to that of related protocols.
 
-% - users have phones and can meet
-% - the key-material can be securely stored and transferred from the phone
 In our system model, we assume that each user has an \ac{NFC}-enabled 
 smartphone.
 This means that we have two communication channels: an \ac{NFC} channel and 
@@ -177,9 +171,6 @@ We assume that a smartphone can generate cryptographically strong random data
 and that this random data is used as key-material.
 Further, we assume that this key-material can be securely stored in the device.
 
-% - phones are not compromised
-% - Eve has transcript of internet traffic
-% - Eve cannot listen on all NFC traffic
 For the adversary model, we assume a stronger adversary, Eve.
 Eve records all traffic in the public channel.
 This means that she records all traffic for the entire Internet.
@@ -189,11 +180,12 @@ transcript.
 But Eve cannot record any communication in the private channel, since she is 
 assumed to be in a different physical space.
 
-We further assume that Eve is passive, i.e.~she cannot access the devices used 
-in the communication at her own will.
-Instead, she will accuse us based on the data and meta-data recorded in her 
-transcript.
-If Eve is trusted by the courts, then her transcript is also trusted.
+We further assume that Eve is active, and that she controls the public 
+channel.
+I.e.~she might delay, modify or remove traffic there.
+However, she cannot access the devices used in the communication.
+Instead, she will force us to reveal the keys to verify the \acp{MAC} and 
+decrypt the ciphertexts she has recorded.
 
 %Finally, we assume that Eve is computationally bounded.
 
@@ -232,7 +224,7 @@ they are talking to the right person.
 But they can do no more than that, Bob can no longer prove to a third party 
 what Alice has sent.
 They accomplish this by a continuous use of the \ac{DH} key-exchange and 
-a \ac{crMAC} based on symmetric keys.
+a \ac{MAC} based on symmetric keys.
 Alice chooses a secret exponent \(a\) and Bob chooses a secret exponent \(b\).
 Alice signs \(g^a\) and sends \[
   A\to B\colon g^a, \Sign_{k_A^{-1}}( g^a )
@@ -240,31 +232,31 @@ Alice signs \(g^a\) and sends \[
 Bob conversely sends \(g^b, \Sign_{k_B^{-1}}( g^b )\) to Alice.
 By this time they can both compute the secret shared-key \(k = g^{ab}\).
 Let \(H_E\) and \(H_M\) be two cryptographically secure hash functions, used 
-for deriving encryption and \ac{crMAC} keys, respectively.
+for deriving encryption and \ac{MAC} keys, respectively.
 When Alice wants to send the message \(m\) to Bob, she chooses a random 
 \(a^\prime\) and sends \[
   A\to B\colon g^{a^\prime}, c = \Enc_{H_E( k )}( k )\oplus m,
   \MAC_{H_M( k )}( g^{a^\prime}, c )
 \] to Bob.
-Once she knows Bob has received the message she also sends the \ac{crMAC} key 
+Once she knows Bob has received the message she also sends the \ac{MAC} key 
 \(H_M( k )\) to Bob.
 The next time Alice wants to send a message to Bob, she will use \(k^\prime 
 = g^{a^\prime b}\).
 
 Now, Bob can no longer prove to a third party what Alice has said.
-This is due to the \ac{crMAC} being based on a secret key which Bob has access 
+This is due to the \ac{MAC} being based on a secret key which Bob has access 
 to.
 Also, since the encryption is done in counter mode~\cite{blockmodes}, the 
 ciphertext is malleable.
 This means that flipping a bit in the ciphertext, yields the same flip in the 
 plaintext.
-Thus, anyone possessing the \ac{crMAC} key can modify the plaintext by flipping 
-the bits in the ciphertext and then generate a new \ac{crMAC}.
+Thus, anyone possessing the \ac{MAC} key can modify the plaintext by flipping 
+the bits in the ciphertext and then generate a new \ac{MAC}.
 
 \subsection{Verifying Who Sent What}
 
 The arguments for forgeability using malleable encryption and publishing the 
-\ac{crMAC} keys only hold if the adversary cannot trust the source of the 
+\ac{MAC} keys only hold if the adversary cannot trust the source of the 
 transcript.
 This more powerful Eve can ultimately trust the transcript since she collected 
 it herself from the network.
@@ -273,22 +265,22 @@ And if the courts trust Eve, they also trust the transcript.
 In this setting the forgeability property vanishes.
 Eve knows that no one has modified the ciphertext, she recorded in her 
 transcript as it left Alice and arrived to Bob.
-She also recorded Alice publishing the \ac{crMAC} key used for the signature.
-This allows Eve to use the \ac{crMAC} for each ciphertext to verify them.
+She also recorded Alice publishing the \ac{MAC} key used for the signature.
+This allows Eve to use the \ac{MAC} for each ciphertext to verify them.
 She knows that Alice is the author of a message because she observes when Alice 
-publishes the \ac{crMAC} key.
+publishes the \ac{MAC} key.
 Thus, Eve also knows that no one has used the malleability property, because if 
 they did, that action would be recorded in Eve's transcript.
 
 \subsection{Verifying Encryption Keys}
 
 Furthermore, Eve also learns some information about the key from the ciphertext 
-and \ac{crMAC}.
-Eve can use the \ac{crMAC} to discard false keys for the ciphertext.
+and \ac{MAC}.
+Eve can use the \ac{MAC} to discard false keys for the ciphertext.
 Since Eve has \(s = \MAC_{H_M( k )}( c )\) for a ciphertext \(c\) recorded in 
 her transcript, she can reject a key \(k^\prime\neq k\) by verifying that
 \(\MAC_{H_M( k^\prime )}( c ) \neq s\).
-Hence, by having the \ac{crMAC} key depend on the encryption key, we 
+Hence, by having the \ac{MAC} key depend on the encryption key, we 
 automatically decrease the number of spurious keys and thus also reduce our 
 possibility for deniability.
 
@@ -326,16 +318,16 @@ attempt finding its preimage.
 
 To be able to get deniability in our given scenario, Alice and Bob need to be 
 able to modify the plaintext without modifying the ciphertext.
-They also need a \ac{crMAC} key independent from the encryption key.
+They also need a \ac{MAC} key independent from the encryption key.
 Then they can change the encryption key and the plaintext, but the ciphertext 
-and \ac{crMAC} remains the same.
+and \ac{MAC} remains the same.
 
 \citeauthor{deniablecrypt} gave the original formal definition of deniable 
-encryption in their seminal paper \cite{deniablecrypt}.
+encryption in their seminal paper~\cite{deniablecrypt}.
 We will give their definition of sender-deniable encryption for shared-key 
 schemes here.
-\begin{definition}[Shared-key sender-deniable encryption]
-  \label{def:DeniableEnc}
+\begin{definition}[Shared-key sender-deniable 
+  encryption]\label{def:DeniableEnc}
   A protocol \(\pi\) with sender \(S\) and receiver \(R\), and with security 
   parameter \(n\), is a shared-key sender-deniable encryption protocol if:
   \begin{description}
@@ -365,13 +357,11 @@ This means that given a ciphertext \(c = \Enc_k( m )\) and a false plaintext
 = \Dec_{k^\prime}( c )\).
 As we illustrate in Sect.~\ref{sec:HardnessOfDeniability}, there exists no such 
 polynomial-time algorithm \(\phi\) for \ac{OTR} or \ac{GPG}.
-%If one existed, then it could be used to break other security mechanisms.
 
 One encryption system for which the algorithm \(\phi\) is trivial is the 
 \ac{OTP}.
-\begin{definition}[One-Time Pad]
-  \label{def:OTP}
-  Let \(M = K = (\Z_2)^n\).
+\begin{definition}[One-Time Pad]\label{def:OTP}
+  Let \(M = K = {(\Z_2)}^n\).
   Then let \(m\in M\) be a message in the message-space \(M\), let \(k\in K\) 
   be a uniformly chosen key in the key-space \(K\).
   Then we define \[
@@ -383,45 +373,34 @@ But this requires that the key \(k\) is as long as the message \(m\).
 The key must be uniformly chosen, i.e.~never reused.
 This is why this scheme is usually considered impractical.
 
-We can easily see, and it is also pointed out in \cite{deniablecrypt}, that the 
+We can easily see, and it is also pointed out in~\cite{deniablecrypt}, that the 
 \ac{OTP} fulfils Def.~\ref{def:DeniableEnc}.
 We can simply define \(\phi( m_2, c ) = m_2\oplus c\) and this would yield 
 \(k^\prime\) such that \[
   \Dec_{k^\prime}( c ) = c\oplus k^\prime = c\oplus ( m_2\oplus c ) = m_2.
 \]
 
-%If \(\Enc\) used in \ac{OTR} would be replaced with \ac{OTP}, then we can 
-%easily compute the false key \(k^\prime\) from a given plaintext-ciphertext 
-%pair.
-
-We also want to resolve the problem of the \ac{crMAC} being a witness for the 
+We also want to resolve the problem of the \ac{MAC} being a witness for the 
 correct key.
-The problem in the previous schemes is that the \ac{crMAC} key is derived from 
+The problem in the previous schemes is that the \ac{MAC} key is derived from 
 the same master key as the encryption key.
-Instead of deriving the encryption key and the \ac{crMAC} key by using two 
+Instead of deriving the encryption key and the \ac{MAC} key by using two 
 different key-derivation functions on the same master key, we have to use 
 information-theoretically independent keys.
 
 We still want authenticated encryption though.
-\citet{authenc} proved that first encrypting the plaintext and then generating 
-a \ac{crMAC} for the ciphertext, always provides secure authenticated 
+\citet{AuthEncJournal} proved that first encrypting the plaintext and then 
+generating a \ac{MAC} for the ciphertext, always provides secure authenticated 
 encryption.
 Since this authenticates the ciphertext, and not the plaintext, it will not 
 interfere with our deniability.
-This way, when using the \ac{OTP} we can keep the \ac{crMAC} key fixed while 
+This way, when using the \ac{OTP} we can keep the \ac{MAC} key fixed while 
 adapting the encryption key to our new plaintext, then hand the keys for both 
-\ac{crMAC} and encryption to the adversary as a (false) witness.
+\ac{MAC} and encryption to the adversary as a (false) witness.
 
 
 \section{Achieving Deniability}
 \label{sec:otp-kx}
-
-% XXX move emphasis from quantification to security proofs
-% - now there's a lot of emphasis on the quantification.  Once you have more of 
-% a protocol description and proof (sketch), this should balance out. Point out 
-% that the measurements and calculations are there just to get an idea of 
-% whether this is feasible at all, and that the numbers will change with 
-% datasets, user behaviour, device, etc.
 
 Due to the deniability requirements outlined above, the randomness used for 
 encryption cannot be extended by a \ac{PRNG}: if we do, then we are in the same 
@@ -434,39 +413,42 @@ This way we can use the everyday chance-encounters for exchanging the generated
 randomness when we meet, and then use it to key the \ac{OTP} scheme when 
 physically apart.
 
-\subsection{The Protocol}
-
-% XXX describe protocol in more detail
-% - still rely on OTR?
-% - who sends what (illustrate with a protocol diagram)
-% - we can still publish the MAC key, so that NSA cannot prove to third party
-% - what properties do we get, include a security proof
-% - talk about what happens if you can't meet or run out of randomness. You 
-% should be able to fall back on the original otr and never be worse off than 
-% that
-% - perhaps you can show that in the protocol diagram or in pseudocode
-
-Alice and Bob want to communicate using this protocol.
-This randomness is then removed from the pool and associated with a known user.
-The received randomness is also associated with the same user.
-The protocol is illustrated in Fig.~\ref{fig:Protocol}.
-
-From a user perspective, putting two phones together <charges the encryption 
-tool>.
+From a user perspective, putting two phones together <charges the deniable 
+encryption tool>.
 This is probably a good metaphor to build on, since it builds on the mental 
 model of a battery.
 Users are already familiar with this model, and thus, when running low on 
 randomness, fewer messages should be exchanged until another physical meeting 
 can be arranged to <charge> the tool again.
 
-We should have more details about the protocol \dots
+\subsection{The Protocol}
+\label{sec:Protocol}
 
-A detailed security proof should go somewhere here, or at least a sketch and 
-details in appendices \dots
+Alice and Bob want to communicate securely with the possibility of deniability 
+in this adversary model.
+Alice and Bob start by each generating a long string of random bits.
+Alice generates the string \(k_A\) of length \(l_A\) from a source of 
+randomness \(R_A\).
+Bob conversely generates \(k_B\) or length \(l_B\) from a source of randomness 
+\(R_B\).
+When Alice and Bob meet, they exchange \(k_A\) and \(k_B\) over the private 
+channel.
+Thus Eve cannot see this traffic.
 
-\marginnote{\raggedright
-  This section is far from done \dots
-}
+Alice and Bob part, and later Alice wants to send a message to Bob over the 
+public channel.
+For Alice to send the message \(m\), the message length \(|m|\) and the size of 
+a \ac{MAC} key, say 256 bits, must be less than \(l_A\).
+Alice then takes the first \(|m|\) bits from \(k_A\), let us denote those bits 
+as \(k_{A,m}\), and computes \(c = m\oplus k_{A,m}\).
+She then takes another 256 bits, say \(k_{A,\MAC}\), and computes a \ac{MAC} 
+tag \(t = \MAC_{k_{A,\MAC}}( c )\).
+She sends the ciphertext and \ac{MAC} tag, \((c, t)\), to Bob, and finally 
+discards the used key-material.
+
+Bob does the converse to send a message (back) to Alice, but he uses bits from 
+the bit string \(k_B\) as key-material.
+The protocol is illustrated in Fig.~\ref{fig:Protocol}.
 
 \begin{figure}
   \centering
@@ -475,31 +457,83 @@ details in appendices \dots
     \newinst[1]{E}{Eve}
     \newinst[1]{B}{Bob}
 
-    \mess{A}{Private channel}{B}
-    \node[anchor=east] at (mess from) {$k_i, k_{i+1}, \ldots, k_j$};
+    \begin{sdblock}{Private channel}{Eve cannot record this}
+      \mess{A}{}{B}
+      \node[anchor=east] at (mess from) {$k_{A,1}, \ldots, k_{A,l}$};
+
+      \mess{B}{}{A}
+      \node[anchor=west] at (mess from) {$k_{B,1}, \ldots, k_{B,l^\prime}$};
+    \end{sdblock}
 
     \begin{sdblock}{Public channel}{Eve records this traffic}
       \mess{A}{}{E}
       \node[anchor=east] at (mess from)
-      {\shortstack{$\Enc_{k_i}( m_{i^\prime} ) = c_{i^\prime}$, \\ 
-      $\MAC_{k_{i+1}}( c_{i^\prime} )$}};
-      \prelevel
+      {\shortstack{$\Enc_{k_{A,m}}( m ) = c$, \\ $\MAC_{k_{A,\MAC}}( c )$}};
+      \prelevel{}
       \mess{E}{}{B}
 
       \mess{B}{}{E}
       \node[anchor=west] at (mess from)
-      {\shortstack{$\Enc_{k_{i+2}}( m_{i^\prime+1} ) = c_{i^\prime+1}$, \\
-      $\MAC_{k_{i+3}}( c_{i^\prime+1} )$}};
-      \prelevel
+      {\shortstack{$\Enc_{k_{B,m^\prime}}( m^\prime ) = c^\prime$, \\
+      $\MAC_{k_{B,\MAC^\prime}}( c^\prime )$}};
+      \prelevel{}
       \mess{E}{}{A}
     \end{sdblock}
 
   \end{sequencediagram}
   \caption{%
     A sequence diagram illustrating the protocol.
-  }
-  \label{fig:Protocol}
+  }\label{fig:Protocol}
 \end{figure}
+
+\subsection{The Security of the Protocol}
+
+Now we cover the security of the protocol.
+The properties we want to have in the protocol are deniable encryption with 
+authenticated ciphertexts.
+
+\begin{theorem}
+   If the entropy of the keys exceeds the message lengths and the \ac{MAC} 
+   scheme is strongly unforgeable, then the protocol in 
+   Sect.~\ref{sec:Protocol} provides perfectly secure and deniable encryption 
+   with authenticated ciphertexts.
+\end{theorem}
+\begin{proof}[sketch]
+  \citet{ShannonSecrecy} showed that if the entropy of the key exceeds the 
+  entropy of the message, then we have perfect secrecy.
+  The protocol ensures that no key is reused, neither for encryption nor 
+  \ac{MAC}.
+
+  We know from Sect.~\ref{sec:deniability} that perfect secrecy implies 
+  deniability.
+  And, finally, we know from \citet{AuthEncJournal} that applying a strongly 
+  unforgeable \ac{MAC} to a ciphertext yields secure authenticated encryption.
+  \qed{}
+\end{proof}
+
+This means that we can have perfectly secure and deniable encryption if we can 
+generate random data with high-enough entropy.
+
+\subsection{Some Extensions}
+
+A problem that can occur is that Alice and Bob might run out of key-material 
+before they can meet again.
+One way to handle this is for them to communicate less as they are closing in 
+on the end of their random bit strings and use the last of the randomness to 
+schedule a new meeting.
+
+An alternative way they can handle this problem is to switch to another scheme, 
+but with the knowledge that it is no longer deniable.
+In a similar fashion, Alice and Bob might not need deniability for all their 
+communications.
+Thus they can switch to e.g.~\ac{OTR} or TextSecure when they do not need 
+deniability against Eve, and then switch back when they want deniability.
+This strategy would use less randomness and they need to meet less often.
+
+Alice can do as in \ac{OTR} and publish the \ac{MAC} key when she receives 
+a reply from Bob.
+The effect we might get through this is that since the \ac{MAC} key is recorded 
+in Eve's transcript, this might lower the trust in Eve's transcript.
 
 
 \section{Implementation and Evaluation}
@@ -523,7 +557,7 @@ The methodology and results are given in each respective section below.
 \label{sec:NeededRandomness}
 Since we use the \ac{OTP}, we need as much key material for encryption as we 
 have plaintext.
-We need some additional key-material for the \acp{crMAC}, e.g.~128--256 bits 
+We need some additional key-material for the \acp{MAC}, e.g.~128--256 bits 
 per sent message.
 Thus we can estimate the total amount of randomness needed by estimating the 
 exchange rate of plaintext.
@@ -591,11 +625,12 @@ stddev_contacts = stddev_contacts.quantize( precdata )
 data_per_day = ( mean_msg_size + stddev_msg_size ) * mean_msg_freq
 \end{pycode}
 
-\marginnote{\raggedright
+\marginnote{\raggedright{}
   \textbf{Note:}
-  The numbers in this and the following sections are preliminary.
-  We have not yet analysed the dataset in detail to discover any possible 
-  problems, e.g.~that replies usually include the history of the conversation.
+  The numbers in this and the following sections are preliminary estimates from 
+  the dataset.
+  We have not yet analysed the dataset in detail to discover any unforeseen 
+  problems.
   This is also the reason why they are rounded to have one or no decimals, 
   rather than rounded according to their number of significant digits.
   All numbers will be rounded to the number of significant digits in the final 
@@ -623,7 +658,7 @@ users to exchange keys with.
 \reversemarginpar
 \marginnote{\raggedright
   \textbf{Note:}
-  We have not yet estimated this number from the dataset.
+  We have not yet estimated the message frequency in the dataset.
   We chose the number \py[random]{mean_msg_freq} as a reasonably high guess.
   The estimated value from the dataset will be available in the final version 
   of the paper.
@@ -681,7 +716,7 @@ print( r"""
   \toprule
 """ )
 
-timespans = {
+timespans = {#
   1 : "Daily",
   7 : "Weekly",
   30 : "Monthly",
@@ -734,43 +769,55 @@ The processor load was measured at \unit{2}{\%} and the input-output load was
 
 \section{Conclusions}
 \label{sec:Conclusions}
-
 % XXX complete the conclusions
-Thus the security of SecureRandom for use with the \ac{OTP} must be 
-investigated further.
-We also have the result of \citet{UniversalityOTP} to consider.
+We set out to design a scheme which provides users with deniability in 
+a stronger adversary model.
+Provided that we can generate random data with high-enough entropy, then our 
+protocol provides
+\begin{itemize}
+  \item perfect secrecy,
+  \item authenticated and
+  \item deniable encryption.
+\end{itemize}
 
+We also showed that our scheme is usable.
+We found that a typical exchange of key material requires less than 
+\unit{10}{\second} to complete.
+Thus the transmission rates are not a usability concern.
 The effects on battery life under the considered use is not a limiting factor 
 in neither the generation of the key-material nor the transmission of the 
-key-material. 
+key-material.
 
-A typical exchange of key material requires less than \unit{10}{\second} to 
-complete.
-Thus the transmission rates are not a usability concern.
-
-Considering the location-based privacy, we would probably like to keep it in 
-flight-mode.
-Then we would save power which can later be used for the exchange.
-
-The method for estimating the amount of communication can be better.
-It depends on the type of communication, e.g.~corporate emails differs from 
-personal text-messaging.
-Due to this it might better to evaluate this from the usage point.
+The method for estimating the needed amount of data can be improved.
+This estimate depends on the type of communication, e.g.~corporate emails 
+differs from personal text-messaging.
+To get more accurate estimates, it might better to evaluate a dataset from 
+other settings.
 To better estimate communication needs for private individuals, it might be 
 better to use text-messages (SMSs).
+However, we intended to show that our scheme is feasible, and we argue that we 
+have reached that goal.
 
-The design of the \ac{NFC} API is hindering the flexibility of the solution.  
-A few concerning points are
+The only issues found in the scheme are related to the <if> regarding 
+high-enough entropy data.
+The security of SecureRandom for use with the \ac{OTP} must be investigated 
+further.
+In addition to \cite{JavaRandomness,AndroidLowEntropyMyth}, we also have the 
+result of \citet{UniversalityOTP} to consider.
+
+As a final note, the design of the \ac{NFC} API is hindering the flexibility of 
+ours and similar solutions.
+We are mostly concerned about the following points:
 \begin{itemize}
   \item There is no mechanism in which to stream data over \ac{NFC}\@.
     This is desirable from a usability standpoint of the app, in particular 
     with regards to interrupted transmissions.
     This might be solved by a more innovative implementation.
-  \item The files currently has to reside on a publicly readable filesystem in 
-    the device.
-    This is a concern for the integrity of the key-material.
-  \item The transmitted files can be intercepted by a malicious app competing 
-    for the received files.
+  \item The transmission must be done in the form of files, and currently these 
+    have to reside on a publicly readable file-system in the device.
+    This is a concern for both the confidentiality and integrity of the 
+    key-material, as the transmitted files can be intercepted by a malicious 
+    app competing for the received files.
 \end{itemize}
 
 \subsection{Future Work}
@@ -812,11 +859,11 @@ in planning for future key-exchanges if the communication pattern changes or
 deviates from normal.
 
 
-\subsubsection*{\ackname}
+%\subsubsection*{\ackname}
 
 %This work was funded by the Swedish Foundation for Strategic Research grant SSF 
 %FFL09-0086 and the Swedish Research Council grant VR 2009-3793.
-We would like to thank the anonymous reviewers for valuable feedback.
+%We would like to thank the anonymous reviewers for valuable feedback.
 
 
 \printbibliography{}
