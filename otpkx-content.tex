@@ -653,8 +653,8 @@ In Tab.~\ref{tbl:MeetingsTradeoff} we tabulate how often two users meet
 compared to how much key-material they would need on average until the next 
 meeting and how long time this data would take to transfer using \ac{NFC}.
 The times provided does not include the setup of the \ac{NFC} radio channel, 
-only actual transmission is considered. The setup phase takes about 5 seconds 
-on the tested devices.
+only actual transmission is considered. The setup phase takes about 
+\unit{5}{\second} on the tested devices.
 
 % XXX improve visualization of the data
 % - Mitra had a good suggestion
@@ -708,11 +708,11 @@ key-exchanges.
 
 \subsection{The Battery Consumption}
 \label{sec:Battery}
-% XXX fix the battery consumption section
 To estimate the effects on battery consumption we find a typical RF-active 
-rating of \unit{60}{mA} for the NFC chip \cite{NFCController}. The battery 
-effects of this is negligible and on the order of $2$\textperthousand of the 
-battery charge at the considered usages.
+rating of \unit{60}{\milli\ampere} for the NFC chip~\cite{NFCController}.
+The battery effects of this is negligible and on the order of 
+\unit{2}{\text{\textperthousand}} of the battery charge at the considered 
+usages.
 
 To estimate the effects on battery consumption we first build a baseline.
 For this we used the Android systems build-in power-consumption estimates.
@@ -720,9 +720,11 @@ We used one phone as a reference and two others running the app implementing
 our scheme.
 
 For the component generating the randomness, tests were performed where we 
-generated the annual demand of key-material. This provided no indication of 
-battery drain. The CPU load was measured at $2\%$, the IO load was measured at 
-$15\%$. 
+generated the annual demand of key-material.
+This provided no indication of battery drain.
+The processor load was measured at \unit{2}{\%} and the input-output load was 
+  measured at \unit{15}{\%}. 
+
 
 \section{Conclusions}
 \label{sec:Conclusions}
@@ -734,8 +736,9 @@ The effects on battery life under the considered use is not a limiting factor
 in neither the generation of the key-material nor the transmission of the 
 key-material. 
 
-A typical exchange of key material requires less than $\unit{10}{s}$ to 
-complete. The transmission rates are not a useability concern in our model. 
+A typical exchange of key material requires less than \unit{10}{\second} to 
+complete.
+Thus the transmission rates are not a usability concern.
 
 Considering the location-based privacy, we would probably like to keep it in 
 flight-mode.
@@ -748,31 +751,39 @@ Due to this it might better to evaluate this from the usage point.
 To better estimate communication needs for private individuals, it might be 
 better to use text-messages (SMSs).
 
-The design of the NFC API is hindering the flexibility of the solution. A few 
-concerning points are
+The design of the \ac{NFC} API is hindering the flexibility of the solution.  
+A few concerning points are
 \begin{itemize}
-\item There is no mechanism in which to stream data over NFC. This is desirable 
-from a usability standpoint of the app. In particular with regards to 
-interrupted transmissions. This might be solved by a more innovative 
-implementation. 
-\item The files currently has to reside on a publicly readable filesystem.  
-	This is a concern for the integrity of the key-material.
-\item The beamed files can be intercepted by a malicious app competing for the 
-	beamed files.
+  \item There is no mechanism in which to stream data over \ac{NFC}\@.
+    This is desirable from a usability standpoint of the app, in particular 
+    with regards to interrupted transmissions.
+    This might be solved by a more innovative implementation.
+  \item The files currently has to reside on a publicly readable filesystem in 
+    the device.
+    This is a concern for the integrity of the key-material.
+  \item The transmitted files can be intercepted by a malicious app competing 
+    for the received files.
 \end{itemize}
-
 
 \subsection{Future Work}
 
 There are several interesting directions to follow from this work.
-First, we can argue the need for deniability as compared to not being able to 
+We start with the technical one.
+The security of the actual \ac{NFC} transfer was out of the scope of this work.
+However, the security of the \ac{NFC} protocol must be considered: in what 
+proximity can Eve successfully record the \ac{NFC} traffic?
+For instance, \citet{RFIDProximity} found that RFID tags could be read over 
+\unit{50}{\metre} away in a hallway.
+But more interestingly, what are the countermeasures?
+
+Next, we can argue the need for deniability as compared to not being able to 
 reveal any keys.
 An interesting first step in this direction would be to conduct a study with 
 users: what is the users' perception of deniability, what is more convincing?
-It would also be interesting to contrast this by looking into game theory to 
-see what can be said about the behaviour of a probable liar: do we gain any 
+This would also be interesting to contrast by looking into game theory to see 
+what can be said about the behaviour of a probable liar: do we gain any 
 credibility using this deniable scheme over simply refusing to disclose the 
-key?
+keys?
 What are the differences if we have a rational adversary compared to an 
 irrational one?
 Finally, there is the legal perspective, which could probably also benefit from 
