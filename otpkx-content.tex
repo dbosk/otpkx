@@ -1,5 +1,6 @@
 \title{%
-Towards Perfectly Secure Communication Using an NFC-Based Key-Exchange Scheme  
+  Towards Perfectly Secure and Deniable Communication Using an NFC-Based 
+  Key-Exchange Scheme
 }
 %\author{%
 %  Daniel Bosk\inst{1}
@@ -463,8 +464,8 @@ We should have more details about the protocol \dots
 A detailed security proof should go somewhere here, or at least a sketch and 
 details in appendices \dots
 
-\marginpar{\raggedright
-  Both this section and this figure are far from done \dots
+\marginnote{\raggedright
+  This section is far from done \dots
 }
 
 \begin{figure}
@@ -584,17 +585,18 @@ mean_contacts, stddev_contacts = \
 mean_contacts = mean_contacts.quantize( precdata )
 stddev_contacts = stddev_contacts.quantize( precdata )
 
-data_per_day = mean_msg_size * mean_msg_freq
+data_per_day = ( mean_msg_size + stddev_msg_size ) * mean_msg_freq
 \end{pycode}
 
-\marginpar{\raggedright
+\marginnote{\raggedright
   \textbf{Note:}
   The numbers in this and the following sections are preliminary.
   We have not yet analysed the dataset in detail to discover any possible 
   problems, e.g.~that replies usually include the history of the conversation.
-
-  This is also the reason why they are rounded to have no decimals, rather than 
-  rounded according to their number of significant digits.
+  This is also the reason why they are rounded to have one or no decimals, 
+  rather than rounded according to their number of significant digits.
+  All numbers will be rounded to the number of significant digits in the final 
+  version of the paper.
 }
 In the Enron dataset, we found that the average message was
 \(\unit{\py[random]{mean_msg_size}}{\byte}\)
@@ -616,20 +618,21 @@ This means that an <extreme> user has approximately
 + 3*stddev_contacts).quantize(decimal.Decimal(10))}\)
 users to exchange keys with.
 
-\marginpar{\raggedright
+\reversemarginpar
+\marginnote{\raggedright
   \textbf{Note:}
   We have not yet estimated this number from the dataset.
   We chose the number \py[random]{mean_msg_freq} as a reasonably high guess.
   The estimated value from the dataset will be available in the final version 
   of the paper.
 }
+\reversemarginpar
 If a user sends
 \(\py[random]{mean_msg_freq}\)
-messages per day, then we need on average
+messages per day, then we need on average less than
 \(\unit{\py[random]{(data_per_day/1024).quantize( 10 )}}{\kibi\byte}\)
 per day.
 
-% XXX how secure is Android's SecureRandom?  enough entropy?
 When we use Android's <SecureRandom> to generate our randomness, we can 
 generate enough amounts of random data.
 Some research \cite{AndroidLowEntropyMyth,JavaRandomness} suggest that 
@@ -644,7 +647,7 @@ further.
 From the above analysis, we know the average amount of data communicated 
 between users per day.
 We also know that the \ac{NFC} protocol can achieve a transmission rate of up 
-to \unit{424}{\kilo\bit\per\second}.
+to \unit{424}{\kilo\bit\per\second}~\cite{NFCController}.
 In Tab.~\ref{tbl:MeetingsTradeoff} we tabulate how often two users meet 
 compared to how much key-material they would need on average until the next 
 meeting and how long time this data would take to transfer using \ac{NFC}.
@@ -667,7 +670,7 @@ print( r"""
 \begin{tabular}{lrr}
   Exchange &
   Time (\second) &
-  Key-material (\byte) \\
+  Key-material (\kibi\byte) \\
   \toprule
 """ )
 
@@ -686,7 +689,7 @@ for i in sorted( timespans.keys() ):
   print( r"%s & \(%s\) & \(%s\) \\" % \
   ( timespans[i],
     ( needed_time ).quantize( prectime ),
-    ( needed_data ).quantize( precdata )
+    ( needed_data/1024 ).quantize( precdata )
     ) )
 
 print( r"""
@@ -709,6 +712,11 @@ To estimate the effects on battery consumption we find a typical RF-active
 rating of \unit{60}{mA} for the NFC chip \cite{NFCController}. The battery 
 effects of this is negligible and on the order of $2$\textperthousand of the 
 battery charge at the considered usages.
+
+To estimate the effects on battery consumption we first build a baseline.
+For this we used the Android systems build-in power-consumption estimates.
+We used one phone as a reference and two others running the app implementing 
+our scheme.
 
 For the component generating the randomness, tests were performed where we 
 generated the annual demand of key-material. This provided no indication of 
