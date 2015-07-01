@@ -38,9 +38,9 @@
   Secondly, we present a scheme which provides the desirable properties of 
   previous schemes, but with stronger deniability under the new adversary 
   model.
-  Our scheme uses physical meetings for exchanges of large amounts of random 
-  key-material via near-field communication and later uses this random data to 
-  key a one-time pad for text-messaging.
+  Our scheme requires physical meetings for exchanges of large amounts of 
+  random key-material via near-field communication and later uses this random 
+  data to key a one-time pad for text-messaging.
   Finally we evaluate the practical feasibility of the suggested scheme.
 
   \keywords{%
@@ -612,7 +612,7 @@ mean_msg_size, stddev_msg_size = \
 mean_msg_size = mean_msg_size.quantize( precdata )
 stddev_msg_size = stddev_msg_size.quantize( precdata )
 
-mean_msg_freq, stddev_msg_freq = ( decimal.Decimal(20), decimal.Decimal(5) )
+mean_msg_freq, stddev_msg_freq = ( decimal.Decimal(40), decimal.Decimal(5) )
 #  mailstat.mean_message_frequency( metadata )
 mean_msg_freq = mean_msg_freq.quantize( precdata )
 stddev_msg_freq = stddev_msg_freq.quantize( precdata )
@@ -670,8 +670,8 @@ messages per day, then we need on average less than
 \(\unit{\py[random]{(data_per_day/1024).quantize( 10 )}}{\kibi\byte}\)
 per day.
 This means that we need approximately
-\(\unit{\py[random]{(data_per_day*365*(mean_contacts+stddev_contacts)/1024/1024).quantize( 
-precdata )}}{\mebi\byte}\) to store one year's key-material.
+\(\unit{\py[random]{(data_per_day*365/1024/1024).quantize( precdata 
+)}}{\mebi\byte}\) to store one year's key-material.
 
 
 We use Android's <SecureRandom> to generate our randomness.
@@ -779,14 +779,21 @@ protocol provides
   \item authenticated and
   \item deniable encryption.
 \end{itemize}
+However, to achieve this scheme and these properties, we require physical 
+meetings to exchange the randomness.
+If Alice and Bob run out of randomness they can fall back to e.g.~\ac{OTR}, but 
+then they lose deniability against Eve.
+In either case, they are never worse of than using \ac{OTR} or TextSecure.
 
 We also showed that our scheme is usable.
 We found that a typical exchange of key material requires less than 
-\unit{10}{\second} to complete.
+\unit{10}{\second} daily to complete.
+If you exchange the key-material on a weekly basis, then it is still less than 
+a minute, while monthly and bimonthly require up to five minutes.
 Thus the transmission rates are not a usability concern.
-The effects on battery life under the considered use is not a limiting factor 
-in neither the generation of the key-material nor the transmission of the 
-key-material.
+Also, the effects on battery life under the considered use is not a limiting 
+factor in neither the generation of the key-material nor the transmission of 
+the key-material.
 
 The method for estimating the needed amount of data can be improved.
 This estimate depends on the type of communication, e.g.~corporate emails 
