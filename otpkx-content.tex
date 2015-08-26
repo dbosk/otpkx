@@ -2,22 +2,22 @@
   Towards Perfectly Secure and Deniable Communication Using an NFC-Based 
   Key-Exchange Scheme
 }
-%\author{%
-%  Daniel Bosk\inst{1}
-%  \and
-%  Martin Kjellqvist\inst{2}
-%  \and
-%  Sonja Buchegger\inst{1}
-%}
-%\institute{%
-%  School of Computer Science and Communication,\\
-%  KTH Royal Institute of Technology, SE-100\,44 Stockholm\\
-%  Email: \email{\{dbosk,buc\}@kth.se}
-%  \and
-%  Department of Information and Communication Systems,\\
-%  Mid Sweden University, SE-851\,70 Sundsvall\\
-%  Email: \email{martin.kjellqvist@miun.se}
-%}
+\author{%
+  Daniel Bosk\inst{1}
+  \and
+  Martin Kjellqvist\inst{2}
+  \and
+  Sonja Buchegger\inst{1}
+}
+\institute{%
+  School of Computer Science and Communication,\\
+  KTH Royal Institute of Technology, SE-100\,44 Stockholm\\
+  Email: \email{\{dbosk,buc\}@kth.se}
+  \and
+  Department of Information and Communication Systems,\\
+  Mid Sweden University, SE-851\,70 Sundsvall\\
+  Email: \email{martin.kjellqvist@miun.se}
+}
 
 \maketitle
 \begin{abstract}
@@ -44,8 +44,12 @@
   Finally we evaluate the practical feasibility of the suggested scheme.
 
   \keywords{%
-    deniability, perfect secrecy, surveillance, strong adversary model, 
-    key-exchange, near-field communication
+    Deniability,
+    Perfect Secrecy,
+    Surveillance,
+    Off-the-Record,
+    Key-Exchange,
+    Near-Field Communication
   }
 \end{abstract}
 
@@ -193,8 +197,8 @@ decrypt the ciphertexts she has recorded.
 \section{Why Alice and Bob Currently Must Forget Their Conversation}
 \label{sec:undeniability}
 
-The security of today's popular services---\ac{GPG}, \ac{OTR} and 
-TextSecure---rely on the standard cryptographic mechanisms.
+The security of today's popular services --- \ac{GPG}, \ac{OTR} and TextSecure 
+--- rely on the standard cryptographic mechanisms.
 These mechanisms provide strong security properties.
 In this section we outline why some of these properties are too strong for 
 deniability in the setting where the adversary has a transcript of all 
@@ -404,9 +408,9 @@ adapting the encryption key to our new plaintext, then hand the keys for both
 
 Due to the deniability requirements outlined above, the randomness used for 
 encryption cannot be extended by a \ac{PRNG}: if we do, then we are in the same 
-situation as when we were using a trap-door permutation---we cannot efficiently 
-find a seed to the \ac{PRNG} which yields a stream that decrypts the ciphertext 
-to the desired plaintext.
+situation as when we were using a trap-door permutation --- we cannot 
+efficiently find a seed to the \ac{PRNG} which yields a stream that decrypts 
+the ciphertext to the desired plaintext.
 Instead we generate randomness continuously and then exchange it using the 
 \ac{NFC} functionality of smartphones.
 This way we can use the everyday chance-encounters for exchanging the generated 
@@ -448,7 +452,26 @@ discards the used key-material.
 
 Bob does the converse to send a message (back) to Alice, but he uses bits from 
 the bit string \(k_B\) as key-material.
-The protocol is illustrated in Fig.~\ref{fig:Protocol}.
+The protocol is illustrated in Fig.~\ref{fig:KeyExchange} and~\ref{fig:Comm}.
+
+\begin{figure}
+  \centering
+  \begin{sequencediagram}
+    \newinst{A}{Alice}
+    \newinst[1]{B}{Bob}
+
+    \mess{A}{}{B}
+    \node[anchor=east] at (mess from) {$k_{A,1}, \ldots, k_{A,l}$};
+
+    \mess{B}{}{A}
+    \node[anchor=west] at (mess from) {$k_{B,1}, \ldots, k_{B,l^\prime}$};
+
+  \end{sequencediagram}
+  \caption{%
+    A sequence diagram illustrating the key exchange.
+    Eve cannot record this as it is communicated over the private channel.
+  }\label{fig:KeyExchange}
+\end{figure}
 
 \begin{figure}
   \centering
@@ -457,33 +480,23 @@ The protocol is illustrated in Fig.~\ref{fig:Protocol}.
     \newinst[1]{E}{Eve}
     \newinst[1]{B}{Bob}
 
-    \begin{sdblock}{Private channel}{Eve cannot record this}
-      \mess{A}{}{B}
-      \node[anchor=east] at (mess from) {$k_{A,1}, \ldots, k_{A,l}$};
+    \mess{A}{}{E}
+    \node[anchor=east] at (mess from)
+    {\shortstack{$\Enc_{k_{A,m}}( m ) = c$, \\ $\MAC_{k_{A,\MAC}}( c )$}};
+    \prelevel{}
+    \mess{E}{}{B}
 
-      \mess{B}{}{A}
-      \node[anchor=west] at (mess from) {$k_{B,1}, \ldots, k_{B,l^\prime}$};
-    \end{sdblock}
-
-    \begin{sdblock}{Public channel}{Eve records this traffic}
-      \mess{A}{}{E}
-      \node[anchor=east] at (mess from)
-      {\shortstack{$\Enc_{k_{A,m}}( m ) = c$, \\ $\MAC_{k_{A,\MAC}}( c )$}};
-      \prelevel{}
-      \mess{E}{}{B}
-
-      \mess{B}{}{E}
-      \node[anchor=west] at (mess from)
-      {\shortstack{$\Enc_{k_{B,m^\prime}}( m^\prime ) = c^\prime$, \\
-      $\MAC_{k_{B,\MAC^\prime}}( c^\prime )$}};
-      \prelevel{}
-      \mess{E}{}{A}
-    \end{sdblock}
-
+    \mess{B}{}{E}
+    \node[anchor=west] at (mess from)
+    {\shortstack{$\Enc_{k_{B,m^\prime}}( m^\prime ) = c^\prime$, \\
+    $\MAC_{k_{B,\MAC^\prime}}( c^\prime )$}};
+    \prelevel{}
+    \mess{E}{}{A}
   \end{sequencediagram}
   \caption{%
-    A sequence diagram illustrating the protocol.
-  }\label{fig:Protocol}
+    A sequence diagram illustrating the correspondence.
+    Eve records this information as it is sent over the public channel.
+  }\label{fig:Comm}
 \end{figure}
 
 \subsection{The Security of the Protocol}
@@ -625,7 +638,7 @@ stddev_contacts = stddev_contacts.quantize( precdata )
 data_per_day = ( mean_msg_size + stddev_msg_size ) * mean_msg_freq
 \end{pycode}
 
-\marginnote{\raggedright{}
+\marginnote{\raggedright{}%
   \textbf{Note:}
   The numbers in this and the following sections are preliminary estimates from 
   the dataset.
@@ -655,15 +668,15 @@ This means that a user has approximately
 \(\py[random]{(mean_contacts 
 + stddev_contacts).quantize(decimal.Decimal(10))}\)
 users to exchange keys with.
-\reversemarginpar
-\marginnote{\raggedright
+\reversemarginpar{}
+\marginnote{\raggedright{}%
   \textbf{Note:}
   We have not yet estimated the message frequency in the dataset.
   We chose the number \py[random]{mean_msg_freq} as a reasonably high guess.
   The estimated value from the dataset will be available in the final version 
   of the paper.
 }
-\reversemarginpar
+\reversemarginpar{}
 If a user sends
 \(\py[random]{mean_msg_freq}\)
 messages per day, then we need on average less than
@@ -809,7 +822,7 @@ The only issues found in the scheme are related to the <if> regarding
 high-enough entropy data.
 The security of SecureRandom for use with the \ac{OTP} must be investigated 
 further.
-In addition to \cite{JavaRandomness,AndroidLowEntropyMyth}, we also have the 
+In addition to~\cite{JavaRandomness,AndroidLowEntropyMyth}, we also have the 
 result of \citet{UniversalityOTP} to consider.
 
 As a final note, the design of the \ac{NFC} API is hindering the flexibility of 
@@ -866,11 +879,11 @@ in planning for future key-exchanges if the communication pattern changes or
 deviates from normal.
 
 
-%\subsubsection*{\ackname}
+\subsubsection*{Acknowledgements}
 
-%This work was funded by the Swedish Foundation for Strategic Research grant SSF 
-%FFL09-0086 and the Swedish Research Council grant VR 2009-3793.
-%We would like to thank the anonymous reviewers for valuable feedback.
+This work was funded by the Swedish Foundation for Strategic Research grant SSF 
+FFL09-0086 and the Swedish Research Council grant VR 2009-3793.
+We would like to thank the anonymous reviewers for valuable feedback.
 
 
 \printbibliography{}
