@@ -8,7 +8,7 @@
 	branch = master
 [submodule "mailstat"]
 	path = mailstat
-	url = http://github.com/dbosk/mailstat.git
+	url = https://github.com/dbosk/mailstat.git
 	branch = master
 [submodule "nfckx-app"]
 	path = nfckx-app
