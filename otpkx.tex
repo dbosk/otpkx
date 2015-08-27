@@ -1,6 +1,6 @@
 %& -shell-escape
 %\documentclass{llncs}
-\documentclass[draft,a4paper]{llncs}
+\documentclass[draft]{llncs}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[british]{babel}
@@ -11,7 +11,7 @@
 
 \usepackage[fulladjust]{marginnote}
 
-\usepackage[natbib,style=lncs,maxbibnames=99,backend=biber]{biblatex}
+\usepackage[natbib,style=lncs]{biblatex}
 \addbibresource{otrmsg.bib}
 \addbibresource{surveillance.bib}
 \addbibresource{crypto.bib}
@@ -20,31 +20,21 @@
 
 \usepackage{csquotes}
 \MakeBlockQuote{<}{|}{>}
-\EnableQuotes
+\EnableQuotes{}
 
 \usepackage{filecontents}
 \usepackage{prettyref}
 \newrefformat{alg}{Algorithm~\ref{#1}}
 
-\usepackage{acronym}
-\input{surveillance.acr}
-\input{crypto.acr}
-\input{stdterm.acr}
+\usepackage[algebra,crypto,surveillance,stdterm]{libbib}
 
 \usepackage{textcomp}
 \usepackage{amsmath}
 \usepackage{amssymb}
-\DeclareMathOperator{\Sign}{\mathsf{Sign}}
-\DeclareMathOperator{\Enc}{\mathsf{Enc}}
-\DeclareMathOperator{\Dec}{\mathsf{Dec}}
-\DeclareMathOperator{\MAC}{\mathsf{MAC}}
-%\NewDocumentCommand{\ord}{m}{\ensuremath |#1|}
-\DeclareMathOperator{\ord}{ord}
-\NewDocumentCommand{\card}{m}{\ensuremath |#1|}
-\NewDocumentCommand{\Z}{}{\ensuremath \mathbb Z}
-\NewDocumentCommand{\K}{}{\ensuremath \mathcal K}
+\NewDocumentCommand{\Z}{}{\ensuremath{\mathbb{Z}}}
+\NewDocumentCommand{\K}{}{\ensuremath{\mathcal{K}}}
 \DeclareMathOperator{\textand}{\qquad and\qquad}
-\DeclareMathOperator{\com}{\textsc com}
+\DeclareMathOperator{\com}{\textsc{com}}
 
 \usepackage[binary,amssymb]{SIunits}
 
