@@ -41,6 +41,7 @@
   Our scheme requires physical meetings for exchanges of large amounts of 
   random key-material via near-field communication and later uses this random 
   data to key a one-time pad for text-messaging.
+  % XXX Add results to the abstract
   Finally we evaluate the practical feasibility of the suggested scheme.
 
   \keywords{%
@@ -102,6 +103,7 @@ This stronger adversary model breaks some assumptions in \ac{OTR}-like
 protocols and removes the possibility for deniability.
 We still want to achieve the same basic properties, e.g.~mutual authentication, 
 but we also want to have stronger deniability.
+Section~\ref{sec:ModelsOverview} gives a more detailed overview.
 
 In Sect.~\ref{sec:undeniability} we show that an adversary who can record all 
 communication in a network can use the deterministic properties of commonly 
@@ -153,6 +155,7 @@ Sect.~\ref{sec:Conclusions}.
 
 
 \section{The System and Adversary Models}
+\label{sec:ModelsOverview}
 
 In this section we present the system and adversary model.
 We start by presenting the system model.
@@ -229,19 +232,24 @@ But they can do no more than that, Bob can no longer prove to a third party
 what Alice has sent.
 They accomplish this by a continuous use of the \ac{DH} key-exchange and 
 a \ac{MAC} based on symmetric keys.
+We provide a simplified description here, mainly to give an understanding of 
+underlying ideas, see the original paper~\cite{otr2004} for a detailed 
+description.
 Alice chooses a secret exponent \(a\) and Bob chooses a secret exponent \(b\).
 Alice signs \(g^a\) and sends \[
   A\to B\colon g^a, \Sign_{k_A^{-1}}( g^a )
 \] to Bob.
-Bob conversely sends \(g^b, \Sign_{k_B^{-1}}( g^b )\) to Alice.
+Bob conversely sends \[%
+  B\to A\colon g^b, \Sign_{k_B^{-1}}( g^b )
+\] to Alice.
 By this time they can both compute the secret shared-key \(k = g^{ab}\).
 Let \(H_E\) and \(H_M\) be two cryptographically secure hash functions, used 
 for deriving encryption and \ac{MAC} keys, respectively.
 When Alice wants to send the message \(m\) to Bob, she chooses a random 
 \(a^\prime\) and sends \[
-  A\to B\colon g^{a^\prime}, c = \Enc_{H_E( k )}( k )\oplus m,
-  \MAC_{H_M( k )}( g^{a^\prime}, c )
-\] to Bob.
+  A\to B\colon g^{a^\prime}, c = \Enc_{H_E( k )}( i )\oplus m,
+  \MAC_{H_M( k )}( g^{a^\prime}, c ),
+\] where \(i\) is some counter, to Bob.
 Once she knows Bob has received the message she also sends the \ac{MAC} key 
 \(H_M( k )\) to Bob.
 The next time Alice wants to send a message to Bob, she will use \(k^\prime 
@@ -781,7 +789,7 @@ The processor load was measured at \unit{2}{\%} and the input-output load was
 
 \section{Conclusions}
 \label{sec:Conclusions}
-% XXX complete the conclusions
+
 We set out to design a scheme which provides users with deniability in 
 a stronger adversary model.
 Provided that we can generate random data with high-enough entropy, then our 
