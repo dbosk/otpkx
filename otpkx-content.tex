@@ -542,17 +542,19 @@ The protocol is illustrated in Fig.~\ref{fig:KeyExchange} and~\ref{fig:Comm}.
 
 \begin{figure}
   \centering
-  \begin{sequencediagram}
-    \newinst{A}{Alice}
-    \newinst[1]{B}{Bob}
+  \begin{msc}[msc keyword=]{}
+    \drawframe{no}
 
-    \mess{A}{}{B}
-    \node[anchor=east] at (mess from) {$k_{A,1}, \ldots, k_{A,l}$};
+    \declinst{A}{}{Alice}
+    %\declinst{E}{}{Eve}
+    \declinst{B}{}{Bob}
 
-    \mess{B}{}{A}
-    \node[anchor=west] at (mess from) {$k_{B,1}, \ldots, k_{B,l^\prime}$};
+    \mess{$k_{A,1}, \ldots, k_{A,l}$}{A}{B}
+    \nextlevel
 
-  \end{sequencediagram}
+    \mess{$k_{B,1}, \ldots, k_{B,l^\prime}$}{B}{A}
+
+  \end{msc}
   \caption{%
     A sequence diagram illustrating the key exchange.
     Eve cannot record this as it is communicated over the private channel.
@@ -561,26 +563,28 @@ The protocol is illustrated in Fig.~\ref{fig:KeyExchange} and~\ref{fig:Comm}.
 
 \begin{figure}
   \centering
-  \begin{sequencediagram}
-    \newinst{A}{Alice}
-    \newinst[1]{E}{Eve}
-    \newinst[1]{B}{Bob}
+  \begin{msc}[msc keyword=]{}
+    \drawframe{no}
 
-    \mess{A}{}{E}
-    \node[anchor=east] at (mess from)
-    {\shortstack{$\Enc_{k_{A,m}}( m ) = c$, \\ $\MAC_{k_{A,\MAC}}( c )$}};
-    \prelevel{}
-    \mess{E}{}{B}
+    \declinst{A}{}{Alice}
+    \declinst{E}{}{Eve}
+    \declinst{B}{}{Bob}
 
-    \mess{B}{}{E}
-    \node[anchor=west] at (mess from)
-    {\shortstack{$\Enc_{k_{B,m^\prime}}( m^\prime ) = c^\prime$, \\
-    $\MAC_{k_{B,\MAC^\prime}}( c^\prime )$}};
-    \prelevel{}
-    \mess{E}{}{A}
-  \end{sequencediagram}
+    \mess{$c, \sigma$}{A}{E}
+    \action*{Record $A\to B\colon c, \sigma$ to transcript}{E}
+    \mess{$c, \sigma$}{E}{B}
+    \nextlevel[2]
+
+    \mess{$c^\prime, \sigma^\prime$}{B}{E}
+    \action*{Record $B\to A\colon c^\prime, \sigma^\prime$ to transcript}{E}
+    \mess{$c^\prime, \sigma^\prime$}{E}{A}
+
+  \end{msc}
   \caption{%
-    A sequence diagram illustrating the correspondence.
+    A sequence diagram illustrating the correspondence;
+    \(c = \Enc_{k_{A,m}}( m )\) and \(\sigma = \MAC_{k_{A,\MAC}}( c )\);
+    \(c^\prime = \Enc_{k_{B,m^\prime}}( m^\prime )\) and \(\sigma^\prime 
+      = \MAC_{k_{B,\MAC^\prime}}( c^\prime )\).
     Eve records this information as it is sent over the public channel.
   }\label{fig:Comm}
 \end{figure}
