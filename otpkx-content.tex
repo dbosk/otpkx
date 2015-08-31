@@ -186,15 +186,62 @@ public channel and any future communication will also be entered into her
 transcript.
 But Eve cannot record any communication in the private channel, since she is 
 assumed to be in a different physical space.
-
-We further assume that Eve is active, and that she controls the public 
-channel.
-I.e.~she might delay, modify or remove traffic there.
-However, she cannot access the devices used in the communication.
+Also, Eve cannot access the devices used in the communication.
 Instead, she will force us to reveal the keys to verify the \acp{MAC} and 
 decrypt the ciphertexts she has recorded.
 
-%Finally, we assume that Eve is computationally bounded.
+% XXX Treat that Eve controls the public channel
+%We further assume that Eve is active, and that she controls the public 
+%channel.
+%I.e.~she might delay, modify or remove traffic there.
+
+In summary, in related works, Eve has had the role of a prosecutor who must 
+prove things to a judge.
+In our model, Eve has the role of being both prosecutor and judge, which is 
+more the case in some surveillance states.
+
+\subsection{A Formal Definition of the Adversary}
+
+We now proceed to give a formal definition of Eve, as she was described above.
+She has the transcript of all communication in the public channel and she 
+forces Alice to reveal the keys used for the ciphertexts in the transcribed
+conversation with Bob.
+Eve's task is to decide whether Alice is trying to lie.
+We formalize this by the following game.
+
+\begin{definition}[Surveillance-State Game]\label{def:StateGame}
+  Let \(A\) be an efficient adversary and \(T = ( t_1, \ldots, t_n )\) be 
+  a sequence of transcribed transmissions.
+  Let \(\phi\) be the challenger algorithm and \(P = ( (m_1, k_1), \ldots, 
+    (m_n, k_n) )\) the messages and keys corresponding to the transcripts in 
+  \(T\).
+  First let the adversary choose (the index of) a transcript \[
+    i\gets A( r, T ),
+  \] where \(r\rgets R\) is random coins sampled from a set \(R\).
+  We create two challenges, \(c_0\) and \(c_1\):
+  \begin{align*}
+    c_0 &\gets k_i, \\
+    c_1 &\gets \phi( r^\prime, i, P ),
+  \end{align*}
+  where \(r^\prime\rgets R\) is again some random coins.
+  Next, we choose a bit \(b\rgets \{0, 1\}\) uniformly randomly.
+  Finally, the adversary outputs a bit \[
+    b^\prime\gets A( r, T, c_b ).
+  \]
+  We define the surveillance-state adversary's advantage as
+  \begin{equation}
+    2 \Pr[ b = b^\prime ] - 1.
+  \end{equation}
+\end{definition}
+
+Alice uses the challenger algorithm \(\phi\) to produce a key \(k_i^\prime\neq 
+  k_i\).
+The goal of our scheme is that the Eve cannot distinguish the two keys using 
+the transcript \(t_i\).
+Next we will outline the problems other protocols have against this adversary.
+We will use \ac{OTR} as an example, but similar arguments can be made against 
+similar protocols.
+Then we will return to our solution in Sect.~\ref{sec:deniability} and onwards.
 
 
 \section{Why Alice and Bob Currently Must Forget Their Conversation}
@@ -409,10 +456,41 @@ interfere with our deniability.
 This way, when using the \ac{OTP} we can keep the \ac{MAC} key fixed while 
 adapting the encryption key to our new plaintext, then hand the keys for both 
 \ac{MAC} and encryption to the adversary as a (false) witness.
+We summarize this in the following theorem.
+
+% XXX Prove that a deniable scheme is still deniable after EtM
+\begin{lemma}\label{lem:StillDeniable}
+  The \ac{OTP} composed with encrypt-then-MAC provides integrity for the 
+  ciphertext but not for the plaintext.
+\end{lemma}
+\begin{proof}
+  We know from above (and~\cite{DeniableEncryption}) that the \ac{OTP} is 
+  a shared-key deniable encryption scheme.
+  \dots
+\end{proof}
+
+\begin{corollary}
+  A shared-key deniable encryption scheme is still shared-key deniable after 
+  being composed with encrypt-then-MAC authenticated encryption.
+\end{corollary}
+
+However, we also need to treat the fact that the \ac{OTP} is a stateful 
+encryption scheme, where encryption and decryption are both stateful.
+
+\begin{lemma}\label{lem:OTPIntegrity}
+  Stateful encryption and decryption composed with encrypt-then-MAC provides 
+  authenticated encryption.
+\end{lemma}
+\begin{proof}
+  We know from \citet{AuthEncryption} that applying a strongly unforgeable 
+  \ac{MAC} to a ciphertext yields secure authenticated encryption.
+  \dots
+\end{proof}
 
 
 \section{Achieving Deniability}
 \label{sec:otp-kx}
+% XXX Move OTP specifics to sec:Implementation
 
 Due to the deniability requirements outlined above, the randomness used for 
 encryption cannot be extended by a \ac{PRNG}: if we do, then we are in the same 
@@ -524,11 +602,8 @@ authenticated ciphertexts.
   entropy of the message, then we have perfect secrecy.
   The protocol ensures that no key is reused, neither for encryption nor 
   \ac{MAC}.
-
-  We know from Sect.~\ref{sec:deniability} that perfect secrecy implies 
-  deniability.
-  And, finally, we know from \citet{AuthEncJournal} that applying a strongly 
-  unforgeable \ac{MAC} to a ciphertext yields secure authenticated encryption.
+  If we combine this with Lem.~\ref{lem:StillDeniable} 
+  and~\ref{lem:OTPIntegrity}, then we have the desired result.
   \qed{}
 \end{proof}
 
