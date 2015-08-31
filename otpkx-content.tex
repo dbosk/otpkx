@@ -94,7 +94,8 @@ In Sect.~\ref{sec:undeniability} we show that this allows an adversary with
 transcripts of all network traffic to verify any statements about the 
 conversation using the transcripts.
 To thwart this we need truly deniable encryption, as defined by 
-\citet{deniablecrypt}, which means that we need to introduce some randomness.
+\citet{DeniableEncryption}, which means that we need to introduce some 
+randomness.
 
 \subsection{Our Contributions}
 
@@ -382,8 +383,8 @@ They also need a \ac{MAC} key independent from the encryption key.
 Then they can change the encryption key and the plaintext, but the ciphertext 
 and \ac{MAC} remains the same.
 
-\citeauthor{deniablecrypt} gave the original formal definition of deniable 
-encryption in their seminal paper~\cite{deniablecrypt}.
+\citeauthor{DeniableEncryption} gave the original formal definition of deniable 
+encryption in their seminal paper~\cite{DeniableEncryption}.
 We will give their definition of sender-deniable encryption for shared-key 
 schemes here.
 \begin{definition}[Shared-key sender-deniable 
@@ -433,8 +434,8 @@ But this requires that the key \(k\) is as long as the message \(m\).
 The key must be uniformly chosen, i.e.~never reused.
 This is why this scheme is usually considered impractical.
 
-We can easily see, and it is also pointed out in~\cite{deniablecrypt}, that the 
-\ac{OTP} fulfils Def.~\ref{def:DeniableEnc}.
+We can easily see, and it is also pointed out in~\cite{DeniableEncryption}, 
+that the \ac{OTP} fulfils Def.~\ref{def:DeniableEnc}.
 We can simply define \(\phi( m_2, c ) = m_2\oplus c\) and this would yield 
 \(k^\prime\) such that \[
   \Dec_{k^\prime}( c ) = c\oplus k^\prime = c\oplus ( m_2\oplus c ) = m_2.
@@ -450,7 +451,7 @@ different key-derivation functions on the same master key, we have to use
 information-theoretically independent keys.
 
 We still want authenticated encryption though.
-\citet{AuthEncJournal} proved that first encrypting the plaintext and then 
+\citet{AuthEncryption} proved that first encrypting the plaintext and then 
 generating a \ac{MAC} for the ciphertext, always provides secure authenticated 
 encryption.
 Since this authenticates the ciphertext, and not the plaintext, it will not 
@@ -765,7 +766,7 @@ This means that we need approximately
 We use Android's <SecureRandom> to generate our randomness.
 This is the only supported way to generate randomness on the Android platform, 
 and it allows us to generate enough amounts of random data.
-Some research \cite{AndroidLowEntropyMyth,JavaRandomness} suggest that 
+Some research~\cite{AndroidLowEntropyMyth,JavaRandomness} suggest that 
 <SecureRandom> under certain circumstances uses a low entropy seed.
 However, the documentation states that SecureRandom can be relied upon for 
 cryptographic purposes.
@@ -793,8 +794,7 @@ only actual transmission is considered. The setup phase takes about
     The table illustrates how the frequency of the key-exchanges affects the 
     required time for each key-exchange.
     Less frequent exchanges requires larger exchanges and, hence, more time.
-  }
-  \label{tbl:MeetingsTradeoff}
+  }\label{tbl:MeetingsTradeoff}
   \begin{pycode}[random]
 print( r"""
 \begin{tabular}{lrr}
