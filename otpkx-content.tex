@@ -374,6 +374,7 @@ attempt finding its preimage.
 
 \section{Requirements for Deniability}
 \label{sec:deniability}
+% XXX Move OTP specifics to sec:Implementation
 
 To be able to get deniability in our given scenario, Alice and Bob need to be 
 able to modify the plaintext without modifying the ciphertext.
@@ -439,6 +440,7 @@ We can simply define \(\phi( m_2, c ) = m_2\oplus c\) and this would yield
   \Dec_{k^\prime}( c ) = c\oplus k^\prime = c\oplus ( m_2\oplus c ) = m_2.
 \]
 
+% XXX Create an authenticated encryption scheme
 We also want to resolve the problem of the \ac{MAC} being a witness for the 
 correct key.
 The problem in the previous schemes is that the \ac{MAC} key is derived from 
@@ -595,6 +597,9 @@ Now we cover the security of the protocol.
 The properties we want to have in the protocol are deniable encryption with 
 authenticated ciphertexts.
 
+% XXX Update security theorem
+% - If the scheme is shared-key sender-deniable, then the protocol together 
+%   with \phi gives negligible advantage to any surveillance-state adversary.
 \begin{theorem}
    If the entropy of the keys exceeds the message lengths and the \ac{MAC} 
    scheme is strongly unforgeable, then the protocol in 
@@ -637,6 +642,7 @@ in Eve's transcript, this might lower the trust in Eve's transcript.
 
 
 \section{Implementation and Evaluation}
+\label{sec:Implementation}
 
 We have developed an app\footnote{%
   The source code is available at URL 
@@ -691,6 +697,9 @@ But our main goal is to get an estimate of user communication to see whether
 our scheme is completely infeasible or not, and we argue that this dataset lets 
 us reach that goal.
 
+% XXX Fix the numbers
+% - Compute the message frequency
+% - Use correct number of significant digits
 \begin{pycode}[random]
 import math
 import sqlite3
@@ -724,17 +733,6 @@ stddev_contacts = stddev_contacts.quantize( precdata )
 data_per_day = ( mean_msg_size + stddev_msg_size ) * mean_msg_freq
 \end{pycode}
 
-\marginnote{\raggedright{}%
-  \textbf{Note:}
-  The numbers in this and the following sections are preliminary estimates from 
-  the dataset.
-  We have not yet analysed the dataset in detail to discover any unforeseen 
-  problems.
-  This is also the reason why they are rounded to have one or no decimals, 
-  rather than rounded according to their number of significant digits.
-  All numbers will be rounded to the number of significant digits in the final 
-  version of the paper.
-}
 In the Enron dataset, we found that the average message was
 \(\unit{\py[random]{mean_msg_size}}{\byte}\)
 excluding any headers and attachments.
@@ -754,15 +752,6 @@ This means that a user has approximately
 \(\py[random]{(mean_contacts 
 + stddev_contacts).quantize(decimal.Decimal(10))}\)
 users to exchange keys with.
-\reversemarginpar{}
-\marginnote{\raggedright{}%
-  \textbf{Note:}
-  We have not yet estimated the message frequency in the dataset.
-  We chose the number \py[random]{mean_msg_freq} as a reasonably high guess.
-  The estimated value from the dataset will be available in the final version 
-  of the paper.
-}
-\reversemarginpar{}
 If a user sends
 \(\py[random]{mean_msg_freq}\)
 messages per day, then we need on average less than
@@ -796,7 +785,7 @@ The times provided does not include the setup of the \ac{NFC} radio channel,
 only actual transmission is considered. The setup phase takes about 
 \unit{5}{\second} on the tested devices.
 
-% XXX improve visualization of the data
+% XXX Improve visualization of the data
 % - Mitra had a good suggestion
 \begin{table}
   \centering
