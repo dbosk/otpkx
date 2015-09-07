@@ -623,7 +623,7 @@ The protocol, run once in each direction, is illustrated in
     \mess{$c, t$}{A}{E}
     \action*{Records $A\to B\colon c, t$ to transcript}{E}
     \mess{$c, t$}{E}{B}
-    \nextlevel[2]
+    \nextlevel[1.6]
 
     \mess{$c^\prime, t^\prime$}{B}{E}
     \action*{Records $B\to A\colon c^\prime, t^\prime$ to transcript}{E}
@@ -1040,7 +1040,6 @@ timespans = {#
   1 : "Daily",
   7 : "Weekly",
   30 : "Monthly",
-  60 : "Bimonthly",
   365 : "Annually"
 }
 
@@ -1115,11 +1114,11 @@ We set out to design a scheme which provides users with deniability in
 a stronger adversary model.
 Provided that we can generate random data with high-enough entropy, then our 
 protocol provides
-\begin{itemize}
+\begin{inparablank}
   \item perfect secrecy,
   \item authenticated and
   \item deniable encryption.
-\end{itemize}
+\end{inparablank}
 However, to achieve this scheme and these properties, we require physical 
 meetings to exchange the randomness.
 If Alice and Bob run out of randomness they can fall back to e.g.~\ac{OTR}, but 
