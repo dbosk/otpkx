@@ -92,7 +92,7 @@ is applied instead.
 For these circumstances, with an adversary that can record all network traffic, 
 it is not possible to create any false witness (proof-of-innocence) due to the 
 deterministic nature of the protocol.
-In Sect.~\ref{sec:undeniability} we show that this allows an adversary with 
+In \cref{Undeniability} we show that this allows an adversary with 
 transcripts of all network traffic to verify any statements about the 
 conversation using the transcripts.
 To thwart this we need truly deniable encryption, as defined by 
@@ -100,21 +100,22 @@ To thwart this we need truly deniable encryption, as defined by
 randomness.
 
 \subsection{Our Contributions}
+\label{Contributions}
 
 We start from protocols like \ac{OTR}, but we assume a stronger adversary.
 This stronger adversary model breaks some assumptions in \ac{OTR}-like 
 protocols and removes the possibility for deniability.
 We still want to achieve the same basic properties, e.g.~mutual authentication, 
 but we also want to have stronger deniability.
-Section~\ref{sec:ModelsOverview} gives a more detailed overview.
+\Cref{ModelsOverview} gives a more detailed overview.
 
-In Sect.~\ref{sec:undeniability} we show that an adversary who can record all 
+In \cref{Undeniability} we show that an adversary who can record all 
 communication in a network can use the deterministic properties of commonly 
 used mechanisms to reject lies about any communication.
-In Sect.~\ref{sec:deniability} we outline what is needed to achieve 
+In \cref{SecurityProperties} we outline what is needed to achieve 
 deniability.
 
-Our main contribution, however, is presented in Sect.~\ref{sec:otp-kx}.
+Our main contribution, however, is presented in \cref{AchievingDeniability}.
 We use \ac{NFC} in smartphones to exchange large-enough amounts of random data 
 when two users physically meet.
 Later, when the users are apart, this data is used to key a \ac{OTP} for use 
@@ -122,7 +123,7 @@ when communicating.
 This is a work-around to achieve deniable communication.
 As we know from \citet{ShannonSecrecy}, if we use the \ac{OTP} correctly, then 
 our communication is even perfectly secure.
-Our scheme is described in detail in Sect.~\ref{sec:otp-kx}.
+Our scheme is described in detail in \cref{AchievingDeniability}.
 
 To estimate the feasibility of this scheme we investigate
 \begin{itemize}
@@ -139,26 +140,26 @@ To estimate the feasibility of this scheme we investigate
 
 We answer the first question by estimating the amount of private communication 
 for some users.
-The details can be found in Sect.~\ref{sec:NeededRandomness}.
+The details can be found in \cref{NeededRandomness}.
 
 We answer the second question by estimating the required number of physical 
 meetings for the same users.
 Since we have an estimate of the amount of exchanged randomness needed and the 
 transmission rates for the \ac{NFC} protocol, we can estimate how many physical 
 meetings and how long transfers are needed to cover the needs.
-The details can be found in Sect.~\ref{sec:Meetings}.
+The details can be found in \cref{NumberOfMeetings}.
 
 For the third question, we estimate the battery usage by performing key 
 generation and exchanges using different Android-based phones while monitoring 
 the battery consumption.
-The details can be found in Sect.~\ref{sec:Battery}.
+The details can be found in \cref{BatteryConsumption}.
 
 Finally we present our conclusions and suggest future work in 
-Sect.~\ref{sec:Conclusions}.
+\cref{Conclusions}.
 
 
 \section{The System and Adversary Models}
-\label{sec:ModelsOverview}
+\label{ModelsOverview}
 
 In this section we present the system and adversary model.
 We start by presenting the system model.
@@ -204,6 +205,7 @@ In our model, Eve has the role of being both prosecutor and judge, which is
 more the case in some surveillance states.
 
 \subsection{A Formal Definition of the Adversary}
+\label{FormalAdversary}
 
 We now proceed to give a formal definition of Eve, as she was described above.
 She has the transcript of all communication in the public channel and she 
@@ -244,11 +246,11 @@ the transcript \(t_i\).
 Next we will outline the problems other protocols have against this adversary.
 We will use \ac{OTR} as an example, but similar arguments can be made against 
 similar protocols.
-Then we will return to our solution in Sect.~\ref{sec:deniability} and onwards.
+Then we will return to our solution in \cref{SecurityProperties} and onwards.
 
 
 \section{Why Alice and Bob Currently Must Forget Their Conversation}
-\label{sec:undeniability}
+\label{Undeniability}
 
 The security of today's popular services --- \ac{GPG}, \ac{OTR} and TextSecure 
 --- rely on the standard cryptographic mechanisms.
@@ -335,6 +337,7 @@ Thus, Eve also knows that no one has used the malleability property, because if
 they did, that action would be recorded in Eve's transcript.
 
 \subsection{Verifying Encryption Keys}
+\label{VerifyingKeys}
 
 Furthermore, Eve also learns some information about the key from the ciphertext 
 and \ac{MAC}.
@@ -347,7 +350,7 @@ automatically decrease the number of spurious keys and thus also reduce our
 possibility for deniability.
 
 \subsection{How Hard Is Deniability?}
-\label{sec:HardnessOfDeniability}
+\label{HardnessOfDeniability}
 
 As suggested above, we have difficulty achieving deniability.
 This is illustrated by the following equations.
@@ -375,22 +378,22 @@ have to break that first, just to find \(H_E( k^\prime )\) before we can
 attempt finding its preimage.
 
 
-\section{Requirements for Deniability}
-\label{sec:deniability}
-% XXX Move OTP specifics to sec:Implementation
+\section{Required Security Properties}
+\label{SecurityProperties}
 
 To be able to get deniability in our given scenario, Alice and Bob need to be 
 able to modify the plaintext without modifying the ciphertext.
 They also need a \ac{MAC} key independent from the encryption key.
 Then they can change the encryption key and the plaintext, but the ciphertext 
 and \ac{MAC} remains the same.
+In this section we will cover the needed security properties.
 
 \citeauthor{DeniableEncryption} gave the original formal definition of deniable 
 encryption in their seminal paper~\cite{DeniableEncryption}.
 We will give their definition of sender-deniable encryption for shared-key 
 schemes here.
 \begin{definition}[Shared-key sender-deniable 
-  encryption]\label{def:DeniableEnc}
+  encryption]\label{DeniableEnc}
   A protocol \(\pi\) with sender \(S\) and receiver \(R\), and with security 
   parameter \(n\), is a shared-key sender-deniable encryption protocol if:
   \begin{description}
@@ -657,13 +660,13 @@ It can also exchange this randomness with another phone over \ac{NFC}.
 
 To estimate the feasibility of this scheme, we investigate the amount of 
 randomness needed and how much randomness we can generate 
-(Sect.~\ref{sec:NeededRandomness}), the required and possible transfer times 
-over \ac{NFC} (Sect.~\ref{sec:Meetings}), and finally how this scheme affects 
-the battery consumption of the smartphone (Sect.~\ref{sec:Battery}).
+(\cref{NeededRandomness}), the required and possible transfer times 
+over \ac{NFC} (\cref{NumberOfMeetings}), and finally how this scheme affects 
+the battery consumption of the smartphone (\cref{BatteryConsumption}).
 The methodology and results are given in each respective section below.
 
 \subsection{The Amount of Randomness Needed}
-\label{sec:NeededRandomness}
+\label{NeededRandomness}
 Since we use the \ac{OTP}, we need as much key material for encryption as we 
 have plaintext.
 We need some additional key-material for the \acp{MAC}, e.g.~128--256 bits 
@@ -776,12 +779,12 @@ Thus the security of SecureRandom for use with the \ac{OTP} must be
 investigated further.
 
 \subsection{The Number of Meetings and Transfer Time}
-\label{sec:Meetings}
+\label{NumberOfMeetings}
 From the above analysis, we know the average amount of data communicated 
 between users per day.
 We also know that the \ac{NFC} protocol can achieve a transmission rate of up 
 to \unit{424}{\kilo\bit\per\second}~\cite{NFCController}.
-In Tab.~\ref{tbl:MeetingsTradeoff} we tabulate how often two users meet 
+In \cref{tbl:MeetingsTradeoff} we tabulate how often two users meet 
 compared to how much key-material they would need on average until the next 
 meeting and how long time this data would take to transfer using \ac{NFC}.
 The times provided does not include the setup of the \ac{NFC} radio channel, 
@@ -838,7 +841,7 @@ More frequently communicating contacts will require a larger part of the
 key-exchanges.
 
 \subsection{The Battery Consumption}
-\label{sec:Battery}
+\label{BatteryConsumption}
 To estimate the effects on battery consumption we find a typical RF-active 
 rating of \unit{60}{\milli\ampere} for the NFC chip~\cite{NFCController}.
 The battery effects of this is negligible and on the order of 
@@ -858,7 +861,7 @@ The processor load was measured at \unit{2}{\%} and the input-output load was
 
 
 \section{Conclusions}
-\label{sec:Conclusions}
+\label{Conclusions}
 
 We set out to design a scheme which provides users with deniability in 
 a stronger adversary model.
