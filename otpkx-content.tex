@@ -325,7 +325,6 @@ Hence, by having the \ac{MAC} key depend on the encryption key, we
 automatically decrease the number of spurious keys and thus also reduce our 
 possibility for deniability.
 
-% XXX Remove HardnessOfDeniability
 \subsection{How Hard Is Deniability?}
 \label{HardnessOfDeniability}
 
@@ -398,9 +397,8 @@ This means that given a ciphertext \(c = \Enc[k]{ m }\) and a false plaintext
 \(m^\prime\), there exists a polynomial-time algorithm \(\phi\) such that 
 \(\phi( c, m^\prime ) = k^\prime\) yields a key \(k^\prime\) and \(m^\prime 
   = \Dec[k^\prime]{ c }\).
-% XXX Remove HardnessOfDeniability
-As we illustrated in \cref{HardnessOfDeniability}, there exists no 
-such polynomial-time algorithm \(\phi\) for \ac{OTR} or \ac{GPG}.
+As we illustrated in \cref{HardnessOfDeniability}, there exists no such 
+polynomial-time algorithm \(\phi\) for \ac{OTR} or \ac{GPG}.
 But one encryption system for which the algorithm \(\phi\) is trivial is the 
 \ac{OTP}.
 
@@ -528,8 +526,8 @@ We summarize this in the following theorem.
   \qed{}
 \end{proof}
 
-Note that the independece of the encryption key and the \ac{MAC} key is crucial 
-in the above theorem.
+Note that the independence of the encryption key and the \ac{MAC} key is 
+crucial in the above theorem.
 If they are not independent, as in \ac{OTR}, then this will only work if there 
 exists an algorithm that can generate a new \ac{MAC} key with the property that 
 the \ac{MAC} algorithm generates the same tag \(t\) for the same ciphertext 
@@ -541,7 +539,6 @@ We will call a scheme composed as in \cref{DeniableEtM} a \emph{deniable
 
 \section{Achieving Deniability Against the Surveillance State}
 \label{AchievingDeniability}
-% XXX Move OTP specifics to Implementation
 
 Due to the deniability requirements outlined above, the randomness used for 
 encryption cannot be extended by a \ac{PRNG}: if we do, then we are in the same 
@@ -556,7 +553,6 @@ encryption scheme when physically apart.
 
 \subsection{A Protocol}
 \label{TheProtocol}
-% XXX Review the description of the protocol
 % XXX Add descriptions of security notions: IND-SFCCA, INT-SFCTXT
 
 Alice and Bob want to communicate securely with the possibility of deniability.
@@ -993,9 +989,9 @@ average amounts, the time required for key-exchanges is still on an order of
 (Order of minutes weekly or half-hours yearly.)
 This number is divided among the contacts with whom the user communicates.
 More frequently communicating contacts will require a larger share of the time.
-The times provided does not include the setup of the \ac{NFC} radio channel, 
+The times provided does not include the set up of the \ac{NFC} radio channel, 
 only actual transmission is considered.
-The setup phase takes about \unit{5}{\second} on the tested devices.
+The set up phase takes about \unit{5}{\second} on the tested devices.
 
 \subsection{The Battery Consumption}
 \label{BatteryConsumption}
