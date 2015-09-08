@@ -19,11 +19,11 @@ enron-dataset.tar.gz:
 	wget -O $@ https://www.cs.cmu.edu/~./enron/enron_mail_20150507.tgz
 
 enron.sqlite3: mailstat.py enron-dataset
-	[ -f $@ ] && ${RM} $@
+	[ ! -f $@ ] || ${RM} $@
 	./mailstat.py -f $@ -d enron-dataset
 
 enron-sent.sqlite3: mailstat.py enron-dataset
-	[ -f $@ ] && ${RM} $@
+	[ ! -f $@ ] || ${RM} $@
 	find enron-dataset -type d | grep "[Ss]ent" | \
 		xargs ./mailstat.py -f $@ -d
 
