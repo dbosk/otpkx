@@ -902,73 +902,29 @@ But our main goal is to get an estimate of user communication to see whether
 our scheme is completely infeasible or not, and we argue that this dataset lets 
 us reach that goal.
 
-% XXX Fix the numbers
-% - Compute the message frequency
-% - Use correct number of significant digits
-\begin{pycode}[random]
-import math
-import sqlite3
-import pathlib
-import sys
-import decimal
-
-sys.path.insert( 0, "mailstat" )
-import mailstat
-#import libsci
-
-metadata = sqlite3.connect( "enron-sent.sqlite3" )
-prectime = decimal.Decimal( "0.1" )
-precdata = decimal.Decimal( "1000" )
-
-mean_msg_size, stddev_msg_size = \
-  mailstat.mean_message_size( metadata )
-mean_msg_size = mean_msg_size.quantize( precdata )
-stddev_msg_size = stddev_msg_size.quantize( precdata )
-
-mean_msg_freq, stddev_msg_freq = mailstat.mean_message_freq( metadata )
-mean_msg_freq *= 60*60*24
-mean_msg_freq = mean_msg_freq.quantize( precdata )
-stddev_msg_freq *= 60*60*24
-stddev_msg_freq = stddev_msg_freq.quantize( precdata )
-
-mean_contacts, stddev_contacts = \
-  mailstat.mean_number_of_contacts( metadata )
-mean_contacts = mean_contacts.quantize( precdata )
-stddev_contacts = stddev_contacts.quantize( precdata )
-
-data_per_day = ( mean_msg_size + stddev_msg_size ) * \
-  ( mean_msg_freq + stddev_msg_freq )
-\end{pycode}
-
 In the Enron dataset, we found that the average message was
-\(\unit{\py[random]{mean_msg_size}}{\byte}\)
+\unit{1000}{\byte}
 excluding any headers and attachments.
 The standard deviation was
-\(\unit{\py[random]{stddev_msg_size}}{\byte}\).
+\unit{6000}{\byte}.
 The large standard deviation can probably be explained by the data being 
 emailed:
 If a conversation requires a few rounds, then the previous messages accumulate 
 in the body of the email as included history.
 
 We also found that the average user communicates with
-\(\py[random]{mean_contacts}\)
+100
 other users.
 The standard deviation was
-\(\py[random]{stddev_contacts}\).
-This means that a user has approximately
-\(\py[random]{(mean_contacts 
-+ stddev_contacts).quantize(decimal.Decimal(10))}\)
-users to exchange keys with.
+200.
 If a user sends
-\(\py[random]{mean_msg_freq}\)
-messages per day (standard deviation:
-\(\py[random]{stddev_msg_freq}\)%
-), then we need on average less than
-\(\unit{\py[random]{(data_per_day/1024).quantize( 10 )}}{\kibi\byte}\)
+5
+messages per day (standard deviation: 15), then we need on average less than
+\unit{137}{\kibi\byte}
 per day.
-This means that we need approximately
-\(\unit{\py[random]{(data_per_day*365/1024/1024).quantize( precdata 
-      )}}{\mebi\byte}\) to store the key-material of one year.
+This means that we need less than
+\unit{50}{\mebi\byte}
+to store the key-material of one year --- for all users.
 
 
 We use Android's <SecureRandom> to generate our randomness.
