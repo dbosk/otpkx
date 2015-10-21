@@ -1,6 +1,3 @@
-%& -shell-escape
-%\documentclass{llncs}
-\documentclass[draft]{llncs}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[british]{babel}
@@ -8,7 +5,7 @@
 \usepackage{xparse}
 \usepackage{booktabs}
 \usepackage{pythontex}
-\usepackage[defblank]{paralist}
+\usepackage[defblank,oldenum]{paralist}
 
 \usepackage[fulladjust]{marginnote}
 
@@ -20,8 +17,8 @@
 \addbibresource{nfc.bib}
 
 \usepackage{csquotes}
-\MakeBlockQuote{<}{|}{>}
-\EnableQuotes{}
+%\MakeBlockQuote{<}{|}{>}
+%\EnableQuotes{}
 
 \usepackage{filecontents}
 \usepackage[capitalize]{cleveref}
@@ -69,11 +66,3 @@
 \setlength{\firstlevelheight}{20pt}
 \setlength{\levelheight}{20pt}
 
-\pagestyle{plain}
-
-\spnewtheorem{protocol}{Protocol}{\bfseries}{\normalfont}
-
-\includeonly{otpkx-content}
-\begin{document}
-\include{otpkx-content}
-\end{document}

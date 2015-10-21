@@ -2,24 +2,62 @@
   Towards Perfectly Secure and Deniable Communication Using an NFC-Based 
   Key-Exchange Scheme
 }
-\author{%
-  Daniel Bosk\inst{1}
-  \and
-  Martin Kjellqvist\inst{2}
-  \and
-  Sonja Buchegger\inst{1}
+\mode<article>{%
+  \author{%
+    Daniel Bosk\inst{1}
+    \and
+    Martin Kjellqvist\inst{2}
+    \and
+    Sonja Buchegger\inst{1}
+  }
 }
-\institute{%
-  School of Computer Science and Communication,\\
-  KTH Royal Institute of Technology, SE-100\,44 Stockholm\\
-  Email: \email{\{dbosk,buc\}@kth.se}
-  \and
-  Department of Information and Communication Systems,\\
-  Mid Sweden University, SE-851\,70 Sundsvall\\
-  Email: \email{martin.kjellqvist@miun.se}
+\mode<presentation>{%
+  \author[Daniel Bosk <dbosk@kth.se>, et al.]{%
+    \textbf{Daniel Bosk}\inst{1}
+    \and
+    Martin Kjellqvist\inst{2}
+    \and
+    Sonja Buchegger\inst{1}
+  }
+}
+\mode<presentation>{%
+  \institute[KTH/MIUN]{%
+    \footnotemark[1]
+    KTH Royal Institute of Technology\\
+    \email{\{dbosk,buc\}@kth.se}
+    \and
+    \footnotemark[2]
+    Mid Sweden University\\
+    \email{martin.kjellqvist@miun.se}
+  }
+}
+\mode<article>{%
+  \institute{%
+    School of Computer Science and Communication,\\
+    KTH Royal Institute of Technology, SE-100\,44 Stockholm\\
+    \email{\{dbosk,buc\}@kth.se}
+    \and
+    Department of Information and Communication Systems,\\
+    Mid Sweden University, SE-851\,70 Sundsvall\\
+    \email{martin.kjellqvist@miun.se}
+  }
+}
+\mode<all>{%
+  \date{NordSec'15, Stockholm, 20th October 2015}
 }
 
-\maketitle
+\mode<presentation>{%
+  \begin{frame}
+    \titlepage{}
+  \end{frame}
+  \begin{frame}{Overview}
+    \tableofcontents
+  \end{frame}
+}
+\mode<article>{\maketitle}
+
+\mode* % required for slides to compile without non-frame text
+
 \begin{abstract}
   In this paper we first analyse the possibility for deniability under a strong 
   adversary, who has an Internet-wide transcript of the communication.
@@ -44,15 +82,60 @@
   }
 \end{abstract}
 
+% Since this a solution template for a generic talk, very little can
+% be said about how it should be structured. However, the talk length
+% of between 15min and 45min and the theme suggest that you stick to
+% the following rules:
+% - Exactly two or three sections (other than the summary).
+% - At *most* three subsections per section.
+% - Talk about 30s to 2min per frame. So there should be between about
+%   15 and 30 frames, all told.
+
+% 1) what is the concrete setting that we consider (entities and their props),
+% 2) what overall functionality and security properties do we want,
+% 3) how are these properties realized (protocols, composition)?
+%
+% - Good synonyms for "looking at":
+%   - investigating, exploring, evaluating, researching, additionally;
+%   - if in relation to something else: contrasting, comparing.
+
 \acresetall{}
+\mode<article>{%
 \section{Introduction}
+}
+\mode<presentation>{%
+  \section[The Problem]{What's the Problem?}
+}
+
+\mode<presentation>{%
+  \subsection{Background}
+  \begin{frame}{Modern Surveillance}
+    \begin{itemize}
+
+      \item We've learned a lot about modern surveillance states since 2013.
+        \begin{itemize}
+          \item Tapping fibre-optic cables~\cite{Fibretap}
+          \item Storing all intercepted data~\cite{NSAStoringCiphertexts}
+          \item Search~\cite{XKeyscore} and 
+            visualization~\cite{BoundlessInformant} capabilities of intercepted 
+            data.
+        \end{itemize}
+
+        \pause{}
+
+      \item Basically they build an Internet-wide transcript of all 
+        communications.
+
+    \end{itemize}
+  \end{frame}
+}
 
 We have learned a lot about modern government surveillance from the Snowden 
 revelations starting in 2013.
 For our current treatment, the most interesting ones are the tapping of 
-fibre-optic cables~\cite{fibretap}, the storage of all intercepted encrypted 
-data~\cite{cryptostore}, the search~\cite{xkeyscore} and visualization 
-capabilities~\cite{boundlessinformant} for all intercepted data.
+fibre-optic cables~\cite{Fibretap}, the storage of all intercepted encrypted 
+data~\cite{NSAStoringCiphertexts}, the search~\cite{XKeyscore} and 
+visualization capabilities~\cite{BoundlessInformant} for all intercepted data.
 It is not the details that are interesting, it is the fact that one actor can 
 collect, store and search Internet-wide transcripts of communication.
 This paper focuses on the possibility of deniability in this setting.
@@ -72,11 +155,53 @@ In 2010, OpenWhisperSystems adapted the \ac{OTR} messaging
 protocol~\cite{frosch2014secure} for use in the smartphone text-messaging app 
 TextSecure.
 
+\mode<presentation>{%
+  \subsection{What we want to do?}
+
+  \begin{frame}{What we want to do?}
+    \begin{itemize}
+      \item Alice and Bob communicate.
+      \item Eve records everything.
+
+        \pause{}
+
+      \item Eve forces Alice to give her a key to decrypt the transcripts.
+      \item Alice doesn't like this.
+
+        \pause{}
+
+      \item Alice wants to give Eve a key \(k^\prime\neq k\) such that \(\Dec[ 
+          k^\prime ]{ c } = m^\prime\).
+
+    \end{itemize}
+  \end{frame}
+
+  \begin{frame}{Popular \acsp{PET}}
+    \begin{itemize}
+      \item GNU Privacy Guard (GPG), Off-the-Record (OTR), TextSecure, \dots
+
+        \pause{}
+
+      \item GPG has no claimed deniability.
+
+        \pause{}
+
+      \item OTR and TextSecure has \ac{PFS}.
+      \item This requires \enquote*{innocent until proven otherwise}.
+
+        \pause{}
+
+      \item What if we're \enquote*{guilty until proven otherwise}?
+
+    \end{itemize}
+  \end{frame}
+}
+
 The construction used for deniability in \ac{OTR}, and the derived protocols, 
-is based on the principle <innocent until proven otherwise>.
+is based on the principle \enquote{innocent until proven otherwise}.
 While this holds true for most civil societies, it is not true everywhere.
-There are circumstances in which the principle <guilty until proven otherwise> 
-is applied instead.
+There are circumstances in which the principle \enquote{guilty until proven 
+  otherwise} is applied instead.
 For these circumstances, with an adversary that can record all network traffic, 
 it is not possible to create any false witness (proof-of-innocence) due to the 
 deterministic nature of the protocol.
@@ -87,7 +212,9 @@ To thwart this we need truly deniable encryption, as defined by
 \citet{DeniableEncryption}, which means that we need to introduce some 
 randomness.
 
+\mode<article>{%
 \subsection{Our Contributions}
+}
 \label{Contributions}
 
 We start from protocols like \ac{OTR}, but we assume a stronger adversary 
@@ -119,11 +246,9 @@ To estimate the feasibility of this scheme we investigate
 \begin{itemize}
   \item the order of magnitude of random data needed to be able to cover 
     everyday text-message conversation;
-
   \item if the \ac{NFC} transmission rates and the random number generation in 
     combination with the number of physical meetings can provide high enough 
     exchange rates in practice; and
-
   \item how the continuous key-generation in this scheme affects battery life 
     in the device.
 \end{itemize}
@@ -140,8 +265,21 @@ generation and exchanges using different Android-based phones while monitoring
 the battery consumption (\cref{BatteryConsumption}).
 
 
+\mode<article>{%
 \section{The System and Adversary Models}
+}
 \label{ModelsOverview}
+
+\mode<presentation>{%
+  \subsection{What part of the problem do we solve?}
+
+  \begin{frame}{How do we go about?}
+    \begin{itemize}
+      \item A public channel, e.g.\ the Internet.
+      \item A private channel, e.g.\ \ac{NFC}.
+    \end{itemize}
+  \end{frame}
+}
 
 In our system model, we assume that we have two communication channels: one 
 private and one public.
@@ -155,6 +293,37 @@ They must do this before any secure communication over the public channel can
 be started.
 We assume that a device can generate cryptographically strong random data and 
 that this key-material can be securely stored on the device.
+
+\mode<presentation>{%
+  \begin{frame}{What can Eve do?}
+    \begin{itemize}
+
+      \item Eve records everything in the public channel.
+      \item She also stores this indefinitely.
+
+        \pause{}
+
+      \item But Eve cannot record anything in the private channel.
+
+    \end{itemize}
+  \end{frame}
+
+  \begin{frame}{What can Eve do?}
+    \begin{itemize}
+      \item In related works, Eve has had the role of prosecutor.
+      \item She has to convince a third-party judge.
+
+        \pause{}
+
+      \item In our model, Eve is both prosecutor and judge.
+      \item Which is more the case in some surveillance states.
+
+        \pause{}
+
+      \item There is a formal definition of this in the paper \dots
+    \end{itemize}
+  \end{frame}
+}
 
 For the adversary model, we assume a stronger adversary, Eve.
 Eve records all traffic in the public channel.
@@ -171,7 +340,9 @@ prove things to a judge.
 In our model, Eve has the role of being both prosecutor and judge, which is 
 more the case in some surveillance states.
 
+\mode<article>{%
 \subsection{A Formal Definition of the Adversary}
+}
 \label{FormalAdversary}
 
 More formally, we summarize Eve's capabilities in the definition below.
@@ -224,7 +395,13 @@ similar protocols.
 Then we will return to our solution in \cref{SecurityProperties} and onwards.
 
 
+\mode<article>{%
 \section{Why Alice and Bob Currently Must Forget Their Conversation}
+}
+\mode<presentation>{%
+  \section[Why a problem?]{Why is this a problem?}
+  \subsection{Because Eve has lots of power}
+}
 \label{Undeniability}
 
 The security of today's popular services --- \ac{GPG}, \ac{OTR} and TextSecure 
@@ -292,7 +469,17 @@ plaintext.
 Thus, anyone possessing the \ac{MAC} key can modify the plaintext by flipping 
 the bits in the ciphertext and then generate a new \ac{MAC}.
 
+\mode<article>{%
 \subsection{Verifying Who Sent What}
+}
+
+\mode<presentation>{%
+  \begin{frame}{Verifying who sent what}
+    \begin{center}
+      Eve has a transcript of all that has happened on the network \dots
+    \end{center}
+  \end{frame}
+}
 
 The arguments for forgeability using malleable encryption and publishing the 
 \ac{MAC} keys only hold if the adversary cannot trust the source of the 
@@ -312,8 +499,23 @@ publishes the \ac{MAC} key.
 Thus, Eve also knows that no one has used the malleability property, because if 
 they did, that action would be recorded in Eve's transcript.
 
+\mode<article>{%
 \subsection{Verifying Encryption Keys}
+}
 \label{VerifyingKeys}
+
+\mode<presentation>{%
+  \begin{frame}{Verifying encryption keys}
+    \begin{itemize}
+      \item Alice says she used key \(k^\prime\).
+
+        \pause{}
+
+      \item Eve computes \(\MAC[H_M( k^\prime )]{ c }\neq t = \MAC[H_M( k )]{ 
+            c }\) and says: No, you didn't.
+    \end{itemize}
+  \end{frame}
+}
 
 Furthermore, Eve also learns some information about the key from the ciphertext 
 and \ac{MAC} tag.
@@ -325,8 +527,30 @@ Hence, by having the \ac{MAC} key depend on the encryption key, we
 automatically decrease the number of spurious keys and thus also reduce our 
 possibility for deniability.
 
+\mode<article>{%
 \subsection{How Hard Is Deniability?}
+}
 \label{HardnessOfDeniability}
+
+\mode<presentation>{%
+  \begin{frame}{How hard is deniability?}
+    \begin{enumerate}
+      \item Given \(m^\prime, c\)
+        \begin{itemize}
+          \item find \(x\) such that \(\Enc[x]{ m^\prime } = c\).
+        \end{itemize}
+
+        \pause{}
+
+      \item Given \(c, x\) as above, \(y\) such that \(\MAC[y]{ c } = t\),
+        \begin{itemize}
+          \item find \(k^\prime\) such that \(H_E( k^\prime ) = x\) and \(H_M( 
+              k^\prime ) = y\).
+        \end{itemize}
+
+    \end{enumerate}
+  \end{frame}
+}
 
 As suggested above, we have difficulty achieving deniability.
 This is illustrated by the following equations.
@@ -354,7 +578,9 @@ will have to break that first, just to find \(H_E( k^\prime )\) before we can
 attempt finding its preimage.
 
 
+\mode<article>{%
 \section{Required Security Properties}
+}
 \label{SecurityProperties}
 
 To be able to get deniability in our given scenario, Alice and Bob need to be 
@@ -381,8 +607,9 @@ schemes here.
       we have \(\Pr[ \Enc[k]{ m_1 } = c ] \approx \Pr[ \Enc[k^\prime]{ m_2 
         } = c ]\).
 
-    \item[Deniability] There exists an efficient <faking> algorithm \(\phi\) 
-      having the following property with respect to any \(m_1, m_2\in M\).
+    \item[Deniability] There exists an efficient \enquote{faking} algorithm 
+      \(\phi\) having the following property with respect to any \(m_1, m_2\in 
+        M\).
       Let \(k, r_S, r_R\) be uniformly chosen shared-key and random inputs of 
       \(S\) and \(R\), respectively, let \(c = \Enc[k, r_S, r_R]{ m_1 }\) and 
       let \((k^\prime, r_S^\prime) = \phi( m_1, k, r_S, c, m_2 )\).
@@ -537,7 +764,13 @@ We will call a scheme composed as in \cref{DeniableEtM} a \emph{deniable
   authenticated encryption} scheme.
 
 
-\section{Achieving Deniability Against the Surveillance State}
+\mode<article>{%
+\section[Achieving Deniability]{Achieving Deniability Against the Surveillance 
+  State}
+}
+\mode<presentation>{%
+  \section[The Solution]{How to solve this?}
+}
 \label{AchievingDeniability}
 
 Due to the deniability requirements outlined above, the randomness used for 
@@ -586,6 +819,7 @@ of the encryption and decryption algorithms.
 The protocol, run once in each direction, is illustrated in 
 \cref{ProtocolOverview}.
 
+\begin{frame}
 \begin{figure}
   \centering
   \begin{msc}[msc keyword=]{}
@@ -611,6 +845,7 @@ The protocol, run once in each direction, is illustrated in
     \mess{$c^\prime, t^\prime$}{E}{A}
 
   \end{msc}
+  \mode<article>{%
   \caption{%
     A sequence diagram illustrating the protocol.
     \(K_A\) and \(K_B\) are long strings of bits sent over the private channel 
@@ -620,10 +855,61 @@ The protocol, run once in each direction, is illustrated in
     \(c^\prime = \Enc[\Key{B,m^\prime}]{ m^\prime }\) and \(t^\prime 
       = \MAC[\TagKey{B,m^\prime}]{ c^\prime }\).
     Eve records this data as it is sent over the public channel.
-  }\label{ProtocolOverview}
+  }}
+  \mode<presentation>{%
+    \caption{%
+      Keys \(K_A, K_B\).
+      Ciphertext \(c = \Enc{ m }\).
+      \ac{MAC}-tag \(t = \MAC{ c }\).
+      \(c^\prime, t^\prime\) correspondingly.
+  }}\label{ProtocolOverview}
 \end{figure}
+\end{frame}
 
 \subsection{The Security of the Protocol}
+
+\mode<presentation>{%
+  \begin{frame}{A rough outline}
+    \begin{center}
+      Define: Eve (formally).
+    \end{center}
+  \end{frame}
+
+  \begin{frame}{A rough outline}
+    \begin{center}
+      Show: Deniable Encryption $\circ$ Encrypt-then-MAC $\implies$ Deniable 
+      Encryption
+    \end{center}
+  \end{frame}
+
+  \begin{frame}{A rough outline}
+    \begin{itemize}
+      \item Assume a \emph{stateful deniable authenticated encryption scheme}.
+
+        \pause{}
+
+      \item Show: such scheme gives Eve negligible advantage.
+
+        \pause{}
+
+      \item Show: such scheme yields IND-SFCCA (indistinguishability under 
+        stateful chosen ciphertext attack).
+    \end{itemize}
+  \end{frame}
+
+  \begin{frame}{A rough outline}
+    \begin{itemize}
+      \item Define: stateful OTP.
+      \item Show: stateful OTP $\implies$ IND-SFCCA.
+
+        \pause{}
+
+      \item Define: stateful MACs.
+      \item Show: stateful MACs $\implies$ INT-SFCTXT (integrity for stateful 
+        ciphertexts).
+    \end{itemize}
+  \end{frame}
+}
 
 We will now show that the protocol just described yields negligible advantage 
 to the surveillance-state adversary (\cref{DEN-SS}).
@@ -699,7 +985,12 @@ provides \ac{IND-SFCCA}, then so will the scheme \(\Scheme*{D}\).
 \end{proof}
 
 
+\mode<article>{%
 \section{Implementation and Evaluation}
+}
+\mode<presentation>{%
+\subsection{Implementation and Evaluation}
+}
 \label{Implementation}
 % XXX Rewrite the implementation and evaluation section
 % - Integrate the OTP specific details
@@ -843,6 +1134,25 @@ We now show that the stateful message authentication mechanism provides
   As such the adversary's advantage is at best to randomly guess the next key.
 \end{proof}
 
+\mode<presentation>{%
+  \begin{frame}{One-Time Pad, practically feasible?}
+    \begin{itemize}
+
+      \item How much random data do we need for everyday messaging?
+
+        \pause{}
+
+      \item How long does it take to transfer using \ac{NFC}?
+
+        \pause{}
+
+      \item How difficult is it to generate this data?
+        Will it drains the phone's battery?
+
+    \end{itemize}
+  \end{frame}
+}
+
 The private channel for the protocol is implemented using the \ac{NFC} protocol 
 with smartphones.
 So Alice and Bob exchange the generated keys over the \ac{NFC} protocol.
@@ -852,7 +1162,7 @@ This is probably a good metaphor to build on, since it builds on the mental
 model of a battery.
 Users are already familiar with this model, and thus, when running low on 
 randomness, fewer messages should be exchanged until another physical meeting 
-can be arranged to <charge> the tool again.
+can be arranged to \enquote{charge} the tool again.
 
 We have developed an app\footnote{%
   The source code is available at URL 
@@ -862,7 +1172,9 @@ It generates randomness continuously in the background to build up a pool of
 randomness.
 It can also exchange this randomness with another phone over \ac{NFC}.
 
-\subsection{The Amount of Randomness Needed}
+\mode<article>{%
+  \subsection{The Amount of Randomness Needed}
+}
 \label{NeededRandomness}
 Since we use the \ac{OTP}, we need as much key material for encryption as we 
 have plaintext.
@@ -880,7 +1192,7 @@ To do this we analyse the Enron email dataset\footnote{%
 We are interested in personal communication, i.e.~we are not interested in 
 newsletters and the like.
 To filter out the newsletter category of messages, we rely on emails found in 
-the users <sent> directory, since these are emails sent by real users.
+the users \enquote{sent} directory, since these are emails sent by real users.
 
 %Since we are using the \ac{OTP}, we also use key material for the replies.
 %We thus also include the received replies to the sent emails.
@@ -936,6 +1248,23 @@ data_per_day = ( mean_msg_size + stddev_msg_size ) * \
   ( mean_msg_freq + stddev_msg_freq )
 \end{pycode}
 
+\mode<presentation>{%
+  \begin{frame}{How practical?}
+    \begin{table}
+      \begin{tabular}{lrr}
+        Freq      & Time                & Key-material ($\kibi\byte$) \\
+        \toprule
+        Daily     & \unit{5}{\second}   & \unit{283}{\kibi\byte} \\
+        Weekly    & \unit{38}{\second}  & \unit{2}{\mebi\byte} \\
+        Monthly   & \unit{3}{min}       & \unit{8}{\mebi\byte} \\
+        Bimonthly & \unit{5}{min}       & \unit{17}{\mebi\byte} \\
+        Annually  & \unit{33}{min}      & \unit{101}{\mebi\byte} \\
+        \bottomrule
+      \end{tabular}
+    \end{table}
+  \end{frame}
+}
+
 In the Enron dataset, we found that the average message was
 \(\unit{\py[random]{mean_msg_size}}{\byte}\)
 excluding any headers and attachments.
@@ -966,19 +1295,21 @@ This means that we need approximately
 \(\unit{\py[random]{(data_per_day*365/1024/1024).quantize( precdata 
       )}}{\mebi\byte}\) to store the key-material of one year.
 
-
-We use Android's <SecureRandom> to generate our randomness.
+We use Android's \enquote{SecureRandom} to generate our randomness.
 This is the only supported way to generate randomness on the Android platform, 
 and it allows us to generate enough amounts of random data.
 Some research~\cite{AndroidLowEntropyMyth,JavaRandomness} suggest that 
-<SecureRandom> under certain circumstances uses a low entropy seed.
+\enquote{SecureRandom} under certain circumstances uses a low entropy seed.
 However, the documentation states that SecureRandom can be relied upon for 
 cryptographic purposes.
 With these contradictory statements, the security of SecureRandom for use with 
 the \ac{OTP} must be investigated further.
 
-\subsection{The Number of Meetings and Transfer Time}
+\mode<article>{%
+  \subsection{The Number of Meetings and Transfer Time}
+}
 \label{NumberOfMeetings}
+
 From the above analysis, we know the average amount of data communicated 
 between users per day.
 We also know that the \ac{NFC} protocol can achieve a transmission rate of up 
@@ -993,7 +1324,9 @@ The times provided does not include the set up of the \ac{NFC} radio channel,
 only actual transmission is considered.
 The set up phase takes about \unit{5}{\second} on the tested devices.
 
+\mode<article>{%
 \subsection{The Battery Consumption}
+}
 \label{BatteryConsumption}
 To estimate the effects on battery consumption we find a typical RF-active 
 rating of \unit{60}{\milli\ampere} for the NFC chip~\cite{NFCController}.
@@ -1012,7 +1345,9 @@ This provided no indication of battery drain.
 The processor load was measured at \unit{2}{\%} and the input-output load was 
   measured at \unit{15}{\%}. 
 
+\mode<article>{%
 \subsection{Some Extensions}
+}
 
 A problem that can occur is that Alice and Bob might run out of key-material 
 before they can meet again.
@@ -1036,6 +1371,33 @@ transcript, and this might lower the trust in Eve's transcript.
 
 \section{Conclusions}
 \label{Conclusions}
+
+\mode<presentation>{%
+  \subsection{Our Contributions}
+
+  \begin{frame}{What did we achieve?}
+    \begin{itemize}
+      \item We assume a stronger adversary model.
+      \item We show that OTR-like protocols are not fully deniable.
+
+        \pause{}
+
+      \item We outline the properties needed for a fully deniable protocol.
+      \item We design a protocol with a superset of the properties of \ac{OTR}:
+        \pause{}
+        \begin{itemize}
+          \item authenticated,
+          \item yet with deniable encryption, and
+          \item perfectly secret.
+        \end{itemize}
+
+        \pause{}
+
+      \item The protocol is based on the OTP.
+      \item We show that the key-exchange is feasible.
+    \end{itemize}
+  \end{frame}
+}
 
 We set out to design a scheme which provides users with deniability in 
 a stronger adversary model.
@@ -1072,12 +1434,27 @@ better to use text-messages (SMSs).
 However, we intended to show that our scheme is feasible, and we argue that we 
 have reached that goal.
 
-The only issues found in the scheme are related to the <if> regarding 
+The only issues found in the scheme are related to the \enquote{if} regarding 
 high-enough entropy data.
 The security of SecureRandom for use with the \ac{OTP} must be investigated 
 further.
 In addition to~\cite{JavaRandomness,AndroidLowEntropyMyth}, we also have the 
 result of \citet{UniversalityOTP} to consider.
+
+\mode<presentation>{%
+  \begin{frame}{Some obstacles \dots}
+    \begin{itemize}
+
+      \item Streaming not possible using \ac{NFC}.
+      \item The API requires files to be transferred.
+
+        \pause{}
+
+      \item These files have to reside in the publicly accessible file system.
+
+    \end{itemize}
+  \end{frame}
+}
 
 As a final note, the design of the \ac{NFC} API is hindering the flexibility of 
 our and similar solutions.
@@ -1094,7 +1471,9 @@ We are mostly concerned about the following points:
     app competing for the received files.
 \end{itemize}
 
+\mode<article>{%
 \subsection{Future Work}
+}
 
 There are several interesting directions to follow from this work.
 % XXX Treat that Eve controls the public channel
@@ -1124,9 +1503,9 @@ exploring these questions.
 
 Another direction, into usable security and privacy, would be to study suitable 
 metaphors and mental models for this kind of system.
-We suspect that the mental model of <charging deniability> when we exchange 
-randomness is good, i.e.~that it does not lead to any contradictory behaviours 
-which might put the user's security and privacy at risk.
+We suspect that the mental model of \enquote{charging deniability} when we 
+exchange randomness is good, i.e.~that it does not lead to any contradictory 
+behaviours which might put the user's security and privacy at risk.
 Our guess is that this is more intuitive than e.g.~asymmetric encryption.
 
 
@@ -1137,6 +1516,15 @@ FFL09-0086 and the Swedish Research Council grant VR 2009-3793.
 We would like to thank the anonymous reviewers for valuable feedback and 
 especially Peeter Laud for very valuable shepherding.
 
+\mode<presentation>{%
+  \begin{frame}
+    \begin{center}
+      Questions?
+    \end{center}
+  \end{frame}
+}
 
+\begin{frame}
 \printbibliography{}
+\end{frame}
 

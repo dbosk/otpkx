@@ -1,13 +1,16 @@
 .PHONY: all
-all: otpkx.pdf
+all: otpkx-paper.pdf otpkx-slides.pdf
 
-otpkx.pdf: otpkx.tex otpkx-content.tex
-otpkx.pdf: libbib.sty
-otpkx.pdf: llncs biblatex-lncs latexmkrc
-otpkx.pdf: otrmsg.bib surveillance.bib crypto.bib
-otpkx.pdf: otpkx.bib nfc.bib
-otpkx.pdf: enron-sent.sqlite3
-otpkx.pdf: msc.sty
+OTPKX_DEPENDS= 		otpkx-preamble.tex otpkx-content.tex
+OTPKX_DEPENDS+= 	libbib.sty
+OTPKX_DEPENDS+= 	latexmkrc
+OTPKX_DEPENDS+= 	otrmsg.bib surveillance.bib crypto.bib
+OTPKX_DEPENDS+= 	otpkx.bib nfc.bib
+OTPKX_DEPENDS+= 	enron-sent.sqlite3
+OTPKX_DEPENDS+= 	msc.sty
+
+otpkx-paper.pdf: otpkx-paper.tex ${OTPKX_DEPENDS} llncs biblatex-lncs
+otpkx-slides.pdf: otpkx-slides.tex ${OTPKX_DEPENDS}
 
 msc.sty:
 	wget -O $@ http://satoss.uni.lu/software/mscpackage/development/msc.sty

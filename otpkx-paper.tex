@@ -1,0 +1,18 @@
+%& -shell-escape
+\documentclass{llncs}
+%\documentclass[draft]{llncs}
+\pagestyle{plain}
+
+\usepackage[hyphens]{url}
+\usepackage[hidelinks]{hyperref}
+
+\input{otpkx-preamble.tex}
+
+\usepackage[noxcolor,noamsthm,notheorems,nokeywords]{beamerarticle}
+\setjobnamebeamerversion{otpkx-slides}
+
+\spnewtheorem{protocol}{Protocol}{\bfseries}{\normalfont}
+
+\begin{document}
+\include{otpkx-content}
+\end{document}
