@@ -1,4 +1,4 @@
-One-Time Pad Key-Exchange
+One-Time Pad Key-Exchange for Deniability
 ===============================================================================
 
 This is the source code of the paper:
@@ -25,7 +25,7 @@ This is the source code of the paper:
 ```
 
 You can find the camera-ready version of the [paper][1] and the [slides][2] 
-under releases.  The published version of the paper is available in 
+under releases.  The published version of the paper is available from 
 [SpringerLink][3].
 
 [1]: https://github.com/dbosk/otpkx/releases/download/v1.1/otpkx.pdf
