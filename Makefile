@@ -46,6 +46,7 @@ clean-depends:
 	${RM} enron-dataset.tar.gz
 	${RM} -R enron-dataset
 	${MAKE} -C mailstat clean
+	${RM} msc.sty
 
 ### INCLUDES ###
 
