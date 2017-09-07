@@ -47,6 +47,7 @@ clean-depends:
 	${RM} -R enron-dataset
 	${MAKE} -C mailstat clean
 	${RM} msc.sty
+	${RM} enron.sqlite3 enron-sent.sqlite3
 
 ### INCLUDES ###
 
