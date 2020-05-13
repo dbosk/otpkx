@@ -24,6 +24,22 @@
 \EnableQuotes{}
 
 \usepackage{filecontents}
+
+\usepackage[algebra,crypto,surveillance,std,stdmaths]{libbib}
+
+\usepackage{textcomp}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\DeclareMathOperator{\com}{\textsc{com}}
+
+\usepackage[binary,amssymb]{SIunits}
+
+\usepackage[plain]{algorithm}
+\usepackage[noend]{algpseudocode}
+\NewDocumentCommand{\alg}{m}{%
+  \textsc{#1}%
+}
+
 \usepackage[capitalize]{cleveref}
 \crefname{chapter}{Chap.}{Chap.}
 \Crefname{chapter}{Chapter}{Chapters}
@@ -43,21 +59,6 @@
 \Crefname{corollary}{Corollary}{Corollaries}
 \crefname{proposition}{Prop.}{Prop.}
 \Crefname{proposition}{Proposition}{Propositions}
-
-\usepackage[algebra,crypto,surveillance,std,stdmaths]{libbib}
-
-\usepackage{textcomp}
-\usepackage{amsmath}
-\usepackage{amssymb}
-\DeclareMathOperator{\com}{\textsc{com}}
-
-\usepackage[binary,amssymb]{SIunits}
-
-\usepackage[plain]{algorithm}
-\usepackage[noend]{algpseudocode}
-\NewDocumentCommand{\alg}{m}{%
-  \textsc{#1}%
-}
 
 \usepackage{msc}
 \setmscvalues{small}
