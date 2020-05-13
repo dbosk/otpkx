@@ -1,6 +1,30 @@
 otpkx-paper.pdf
 otpkx-slides.pdf
 
+biblatex-lncs-src/
+crypto.bib
+enron-dataset.tar.gz
+enron_mail_20150507.tar.gz
+latexmkrc
+libbib.sty
+llncs.cls
+llncs2e.zip
+lncs.bbx
+lncs.cbx
+lncs.dbx
+mailstat.py
+nfc.bib
+otpkx.bib
+otrmsg.bib
+splncs04.bst
+surveillance.bib
+
+enron-dataset/
+msc.sty
+otpkx.pdf
+otpkx.pytxcode
+pythontex-files-otpkx/
+
 # Project specific
 *.sqlite3
 
