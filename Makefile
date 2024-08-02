@@ -15,7 +15,7 @@ enron-dataset: enron-dataset.tar.gz
 	pax -rz -f $^ -s "|^maildir/|$@/|"
 
 enron-dataset.tar.gz:
-	wget -O $@ https://www.cs.cmu.edu/~./enron/enron_mail_20150507.tgz
+	wget -O $@ https://www.cs.cmu.edu/~./enron/enron_mail_20150507.tar.gz
 
 enron.sqlite3: mailstat.py enron-dataset
 	[ ! -f $@ ] || ${RM} $@
@@ -45,6 +45,8 @@ clean-depends:
 	${RM} enron-dataset.tar.gz
 	${RM} -R enron-dataset
 	${MAKE} -C mailstat clean
+	${RM} msc.sty
+	${RM} enron.sqlite3 enron-sent.sqlite3
 
 ### INCLUDES ###
 
